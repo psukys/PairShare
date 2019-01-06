@@ -1,0 +1,15 @@
+<resources>
+    <string name="app_name">PairShare</string>
+    <string name="nav_add">Add</string>
+    <string name="nav_summary">Summary</string>
+    <string name="label_add_entry">Add Entry</string>
+    <string name="label_summary">Summary</string>
+    <string name="label_add_a_comment">Add a comment (optional)</string>
+    <string name="hint_add_a_comment">Add a comment describing the expense (optional):</string>
+    <string name="title_add_a_new_expense">Add a new expense:</string>
+    <string name="label_add_time">Time:</string>
+    <string name="label_add_expense">Expense (€):</string>
+    <string name="hint_add_how_much_did_you_spend">How much did you spend?</string>
+    <string name="bt_add">Add</string>
+
+</resources>
