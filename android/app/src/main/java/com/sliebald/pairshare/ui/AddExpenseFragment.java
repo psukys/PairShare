@@ -8,7 +8,7 @@ import android.view.ViewGroup;
 import android.widget.DatePicker;
 
 import com.sliebald.pairshare.R;
-import com.sliebald.pairshare.databinding.FragmentAddEntryBinding;
+import com.sliebald.pairshare.databinding.FragmentAddExpenseBinding;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -18,26 +18,27 @@ import java.util.Objects;
 import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
 
-public class AddEntryFragment extends Fragment {
+public class AddExpenseFragment extends Fragment {
 
     /**
      * Databinding of the corresponding fragment layout.
      */
-    private FragmentAddEntryBinding mBinding;
+    private FragmentAddExpenseBinding mBinding;
+
+    private Calendar mSelectedDate;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         mBinding = DataBindingUtil.inflate(inflater, R.layout
-                .fragment_add_entry, container, false);
-
+                .fragment_add_expense, container, false);
         setupTimePicker();
         return mBinding.getRoot();
     }
 
     private void setupTimePicker() {
-        final Calendar calendar = Calendar.getInstance();
+        mSelectedDate = Calendar.getInstance();
         mBinding.etAddDate.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -47,22 +48,20 @@ public class AddEntryFragment extends Fragment {
                     @Override
                     public void onDateSet(DatePicker view, int year, int month, int
                             dayOfMonth) {
-                        setDate(year, month, dayOfMonth);
+                        mSelectedDate.set(year, month, dayOfMonth);
+                        setDate();
                     }
-                }, calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get
-                        (Calendar.DAY_OF_MONTH));
+                }, mSelectedDate.get(Calendar.YEAR), mSelectedDate.get(Calendar.MONTH),
+                        mSelectedDate.get(Calendar.DAY_OF_MONTH));
                 datePickerDialog.show();
             }
         });
-        setDate(calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get
-                (Calendar.DAY_OF_MONTH));
+        setDate();
     }
 
-    private void setDate(int year, int month, int day) {
+    private void setDate() {
         SimpleDateFormat format = new SimpleDateFormat("EEE, dd.MM.yyyy", Locale.getDefault());
-        Calendar calendar = Calendar.getInstance();
-        calendar.set(year, month, day);
-        mBinding.etAddDate.setText(format.format(calendar.getTime()));
+        mBinding.etAddDate.setText(format.format(mSelectedDate.getTime()));
 
     }
 }

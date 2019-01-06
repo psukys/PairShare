@@ -32,7 +32,7 @@ public class MainActivity extends AppCompatActivity {
         // set addEntry and summary as tld destinations --> no back button
         mNavController = Navigation.findNavController(this, R.id.my_nav_host_fragment);
         Set<Integer> tlds = new HashSet<>();
-        tlds.add(R.id.addEntry_dest);
+        tlds.add(R.id.addExpense_dest);
         tlds.add(R.id.summary_dest);
 
 
