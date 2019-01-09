@@ -8,7 +8,7 @@
             <LayoutPositions>
               <option name="myPositions">
                 <map>
-                  <entry key="addEntryFragment">
+                  <entry key="addExpense_dest">
                     <value>
                       <LayoutPositions>
                         <option name="myPosition">
@@ -29,7 +29,7 @@
                       </LayoutPositions>
                     </value>
                   </entry>
-                  <entry key="summaryFragment">
+                  <entry key="summary_dest">
                     <value>
                       <LayoutPositions>
                         <option name="myPosition">

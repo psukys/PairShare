@@ -1,4 +1,4 @@
-package com.sliebald.pairshare.ui;
+package com.sliebald.pairshare.ui.summary;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;

@@ -20,11 +20,16 @@ android {
     dataBinding {
         enabled = true
     }
+    compileOptions {
+        sourceCompatibility = '1.8'
+        targetCompatibility = '1.8'
+    }
 }
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation 'androidx.legacy:legacy-support-v4:1.0.0'
+    implementation 'androidx.lifecycle:lifecycle-extensions:2.0.0-alpha1'
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'androidx.test:runner:1.1.1'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.1.1'
@@ -38,6 +43,7 @@ dependencies {
     implementation 'android.arch.navigation:navigation-fragment:1.0.0-alpha09'
     implementation 'android.arch.navigation:navigation-ui:1.0.0-alpha09'
 
-    //Keyboard event listener
+    // Keyboard event listener
+    // https://github.com/yshrsmz/KeyboardVisibilityEvent
     implementation 'net.yslibrary.keyboardvisibilityevent:keyboardvisibilityevent:2.2.0'
 }
