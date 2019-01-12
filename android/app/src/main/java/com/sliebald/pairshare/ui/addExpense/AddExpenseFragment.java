@@ -37,6 +37,7 @@ public class AddExpenseFragment extends Fragment {
         // Inflate the layout for this fragment
         mBinding = DataBindingUtil.inflate(inflater, R.layout
                 .fragment_add_expense, container, false);
+
         return mBinding.getRoot();
     }
 
@@ -50,6 +51,7 @@ public class AddExpenseFragment extends Fragment {
     public void onStart() {
         super.onStart();
         mViewModel.getCalendar().observe(this, this::setDate);
+        mViewModel.updateUser();
         setupTimePicker();
     }
 

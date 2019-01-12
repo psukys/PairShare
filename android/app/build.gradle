@@ -29,7 +29,7 @@ android {
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation 'androidx.legacy:legacy-support-v4:1.0.0'
-    implementation 'androidx.lifecycle:lifecycle-extensions:2.0.0-alpha1'
+    implementation 'androidx.lifecycle:lifecycle-extensions:2.1.0-alpha01'
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'androidx.test:runner:1.1.1'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.1.1'
@@ -46,4 +46,15 @@ dependencies {
     // Keyboard event listener
     // https://github.com/yshrsmz/KeyboardVisibilityEvent
     implementation 'net.yslibrary.keyboardvisibilityevent:keyboardvisibilityevent:2.2.0'
+
+    // firebase
+    implementation 'com.google.firebase:firebase-core:16.0.6'
+    //firebase authentication
+    implementation 'com.google.firebase:firebase-auth:16.1.0'
+    implementation 'com.firebaseui:firebase-ui-auth:4.2.0'
+    //firestore
+    implementation 'com.google.firebase:firebase-firestore:17.1.5'
+
+
 }
+apply plugin: 'com.google.gms.google-services'
