@@ -2,16 +2,10 @@ package com.sliebald.pairshare.ui.addExpense;
 
 import android.util.Log;
 
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
-import com.google.firebase.firestore.FirebaseFirestore;
-import com.sliebald.pairshare.data.User;
+import com.sliebald.pairshare.data.Repository;
 
 import java.util.Calendar;
-import java.util.HashMap;
-import java.util.Map;
 
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
@@ -38,20 +32,18 @@ class AddExpenseViewModel extends ViewModel {
         }
     }
 
-    void updateUser() {
+    /**
+     * Get the current User.
+     */
+    void getUser() {
 
-        FirebaseUser fUser = FirebaseAuth.getInstance().getCurrentUser();
-        if (fUser == null)
-            return;
-        FirebaseFirestore db = FirebaseFirestore.getInstance();
-        DocumentReference docRef = db.collection("users").document(fUser.getUid());
-        docRef.get().addOnCompleteListener(task -> {
+        Repository.getInstance().getCurrentUser(task -> {
             if (task.isSuccessful()) {
                 DocumentSnapshot document = task.getResult();
                 if (document != null && document.exists()) {
                     Log.d(TAG, "DocumentSnapshot data: " + document.getData());
                 } else {
-                    createUser(fUser);
+                    Repository.getInstance().createNewUser();
                     Log.d(TAG, "No such document");
                 }
             } else {
@@ -59,20 +51,6 @@ class AddExpenseViewModel extends ViewModel {
             }
         });
 
-
     }
 
-    private void createUser(FirebaseUser fUser) {
-        User user = new User();
-        user.setName(fUser.getDisplayName());
-        if (fUser.getPhotoUrl() != null)
-            user.setPhotoUri(fUser.getPhotoUrl().toString());
-        user.setUid(fUser.getUid());
-        Map<String, String> shares = new HashMap<>();
-        shares.put("grgerhewh", "Sbnrbsrege");
-        shares.put("stvvfvvdfaate", "44444444");
-        user.setShares(shares);
-        FirebaseFirestore db = FirebaseFirestore.getInstance();
-        db.collection("users").document(user.getUid()).set(user);
-    }
 }

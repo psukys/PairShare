@@ -51,7 +51,7 @@ public class AddExpenseFragment extends Fragment {
     public void onStart() {
         super.onStart();
         mViewModel.getCalendar().observe(this, this::setDate);
-        mViewModel.updateUser();
+        mViewModel.getUser();
         setupTimePicker();
     }
 
