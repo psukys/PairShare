@@ -7,7 +7,7 @@
         android:title="@string/nav_add" />
 
     <item
-        android:id="@+id/summary_dest"
+        android:id="@+id/selectExpense_dest"
         android:icon="@drawable/ic_dashboard_black_24dp"
         android:title="@string/nav_summary" />
 

@@ -9,6 +9,8 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.sliebald.pairshare.data.models.Expense;
+import com.sliebald.pairshare.data.models.ExpenseOverview;
 import com.sliebald.pairshare.data.models.User;
 
 import java.util.HashMap;
@@ -26,6 +28,10 @@ public class Repository {
     private static Repository sInstance;
     private FirebaseUser mFbUser;
     private FirebaseFirestore mDb;
+
+    public static final String COLLECTION_KEY_USERS = "users";
+    public static final String COLLECTION_KEY_EXPENSE_OVERVIEW = "expenses_overview";
+    public static final String COLLECTION_KEY_EXPENSE = "expenses";
 
     private Repository() {
         mFbUser = FirebaseAuth.getInstance().getCurrentUser();
@@ -68,17 +74,38 @@ public class Repository {
      */
     public void createNewUser() {
         User user = new User();
-        user.setName(mFbUser.getDisplayName());
-        if (mFbUser.getPhotoUrl() != null)
-            user.setPhotoUri(mFbUser.getPhotoUrl().toString());
-        user.setUid(mFbUser.getUid());
+        //     user.setName(mFbUser.getDisplayName());
         user.setMail(mFbUser.getEmail());
-        Map<String, String> shares = new HashMap<>();
-//        shares.put("1111", "1234");
-        //      shares.put("2222", "5678");
-        user.setShares(shares);
-        mDb.collection("users").document(user.getUid()).set(user);
+//       Map<String, String> shares = new HashMap<>();
+//       shares.put("1111", "1234");
+//       shares.put("2222", "5678");
+//       user.setShares(shares);
+        mDb.collection(COLLECTION_KEY_USERS).document(mFbUser.getUid()).set(user);
     }
 
+    public void createTestExpense() {
+        ExpenseOverview expenseOverview = new ExpenseOverview();
+
+        Map<String, String> sharer = new HashMap<>();
+        sharer.put(mFbUser.getUid(), "1234");
+        expenseOverview.setSharer(sharer);
+        mDb.collection(COLLECTION_KEY_EXPENSE_OVERVIEW).document("test").set(expenseOverview);
+
+    }
+
+
+    public void createTestExpenseOverview() {
+        Expense expense = new Expense();
+        expense.setUserID(mFbUser.getUid());
+        expense.setAmount(50.1);
+        expense.setComment("This is a test expense");
+        mDb.collection(COLLECTION_KEY_EXPENSE_OVERVIEW).document("test").collection(COLLECTION_KEY_EXPENSE).add(expense);
+        expense.setUserID(mFbUser.getUid());
+        expense.setAmount(150.1);
+        expense.setComment("This is a second test expense");
+
+        mDb.collection(COLLECTION_KEY_EXPENSE_OVERVIEW).document("test").collection(COLLECTION_KEY_EXPENSE).add(expense);
+
+    }
 
 }

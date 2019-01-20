@@ -2,7 +2,6 @@ package com.sliebald.pairshare;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 
 import com.firebase.ui.auth.AuthUI;
@@ -12,7 +11,6 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
 import net.yslibrary.android.keyboardvisibilityevent.KeyboardVisibilityEvent;
-import net.yslibrary.android.keyboardvisibilityevent.KeyboardVisibilityEventListener;
 
 import java.util.Arrays;
 import java.util.HashSet;
@@ -44,50 +42,39 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
         // set addEntry and summary as tld destinations --> no back button
         mNavController = Navigation.findNavController(this, R.id.my_nav_host_fragment);
         Set<Integer> tlds = new HashSet<>();
         tlds.add(R.id.addExpense_dest);
-        tlds.add(R.id.summary_dest);
+        tlds.add(R.id.selectExpense_dest);
 
+        mFirebaseAuth = FirebaseAuth.getInstance();
+        mFirebaseUser = mFirebaseAuth.getCurrentUser();
 
+        mNavController.addOnDestinationChangedListener((controller, destination, arguments) -> {
+            if (mFirebaseUser == null) {
+                // Not signed in, launch the Sign In activity
+                List<AuthUI.IdpConfig> providers = Arrays.asList(
+                        new AuthUI.IdpConfig.EmailBuilder().build(),
+                        new AuthUI.IdpConfig.GoogleBuilder().build());
+                startActivityForResult(
+                        AuthUI.getInstance()
+                                .createSignInIntentBuilder()
+                                .setIsSmartLockEnabled(!BuildConfig.DEBUG, true)
+                                .setAvailableProviders(providers)
+                                .build(),
+                        RC_SIGN_IN);
+                finish();
+            } else {
+                //if (BuildConfig.DEBUG)
+                //  AuthUI.getInstance().signOut(this);
+            }
+        });
         mAppBarConfiguration = new AppBarConfiguration.Builder(tlds).build();
         setupActionBar(mNavController);
         setupBottomNavMenu(mNavController);
 
-
-        mFirebaseAuth = FirebaseAuth.getInstance();
-        mFirebaseUser = mFirebaseAuth.getCurrentUser();
-        if (mFirebaseUser == null) {
-            // Not signed in, launch the Sign In activity
-            List<AuthUI.IdpConfig> providers = Arrays.asList(
-                    new AuthUI.IdpConfig.EmailBuilder().build(),
-                    new AuthUI.IdpConfig.GoogleBuilder().build());
-            startActivityForResult(
-                    AuthUI.getInstance()
-                            .createSignInIntentBuilder()
-                            .setAvailableProviders(providers)
-                            .build(),
-                    RC_SIGN_IN);
-            finish();
-            return;
-        } else {
-            //TODO: make something useful
-            if (mFirebaseUser.getPhotoUrl() != null) {
-                Log.d("test", "" + mFirebaseUser.getPhotoUrl().toString());
-            }
-        }
-
-
     }
-
-    @Override
-    protected void onStart() {
-        super.onStart();
-
-    }
-
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -122,14 +109,11 @@ public class MainActivity extends AppCompatActivity {
         // Hide the bottom navigation if the keyboard is open.
         KeyboardVisibilityEvent.setEventListener(
                 this,
-                new KeyboardVisibilityEventListener() {
-                    @Override
-                    public void onVisibilityChanged(boolean isOpen) {
-                        if (isOpen) {
-                            bottomNav.setVisibility(View.GONE);
-                        } else {
-                            bottomNav.setVisibility(View.VISIBLE);
-                        }
+                isOpen -> {
+                    if (isOpen) {
+                        bottomNav.setVisibility(View.GONE);
+                    } else {
+                        bottomNav.setVisibility(View.VISIBLE);
                     }
                 });
 

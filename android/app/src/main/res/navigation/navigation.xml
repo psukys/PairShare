@@ -11,16 +11,17 @@
         android:label="@string/label_add_entry"
         tools:layout="@layout/fragment_add_expense">
         <action
-            android:id="@+id/action_addEntryFragment_to_summaryFragment"
-            app:destination="@id/summary_dest"
+            android:id="@+id/action_addEntryFragment_to_selectExpenseFragment"
+            app:destination="@id/selectExpense_dest"
             app:enterAnim="@anim/slide_in_right"
             app:exitAnim="@anim/slide_out_left"
             app:popEnterAnim="@anim/slide_in_left"
             app:popExitAnim="@anim/slide_out_right" />
     </fragment>
     <fragment
-        android:id="@+id/summary_dest"
-        android:name="com.sliebald.pairshare.ui.summary.SummaryFragment"
-        android:label="@string/label_summary"
-        tools:layout="@layout/fragment_summary" />
+        android:id="@+id/selectExpense_dest"
+        android:name="com.sliebald.pairshare.ui.selectExpenseList.SelectExpenseFragment"
+        android:label="fragment_select_expense"
+        tools:layout="@layout/fragment_select_expense" />
+
 </navigation>
