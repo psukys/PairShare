@@ -2,6 +2,8 @@ package com.sliebald.pairshare;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 
 import com.firebase.ui.auth.AuthUI;
@@ -36,24 +38,18 @@ public class MainActivity extends AppCompatActivity {
     private NavController mNavController;
 
     private FirebaseAuth mFirebaseAuth;
-    private FirebaseUser mFirebaseUser;
+    private FirebaseAuth.AuthStateListener authStateListener;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        // set addEntry and summary as tld destinations --> no back button
-        mNavController = Navigation.findNavController(this, R.id.my_nav_host_fragment);
-        Set<Integer> tlds = new HashSet<>();
-        tlds.add(R.id.addExpense_dest);
-        tlds.add(R.id.selectExpense_dest);
 
         mFirebaseAuth = FirebaseAuth.getInstance();
-        mFirebaseUser = mFirebaseAuth.getCurrentUser();
-
-        mNavController.addOnDestinationChangedListener((controller, destination, arguments) -> {
-            if (mFirebaseUser == null) {
-                // Not signed in, launch the Sign In activity
+        authStateListener = firebaseAuth -> {
+            FirebaseUser firebaseUser = firebaseAuth.getCurrentUser();
+            if (firebaseUser == null) {
                 List<AuthUI.IdpConfig> providers = Arrays.asList(
                         new AuthUI.IdpConfig.EmailBuilder().build(),
                         new AuthUI.IdpConfig.GoogleBuilder().build());
@@ -61,20 +57,22 @@ public class MainActivity extends AppCompatActivity {
                         AuthUI.getInstance()
                                 .createSignInIntentBuilder()
                                 .setIsSmartLockEnabled(!BuildConfig.DEBUG, true)
-                                .setAvailableProviders(providers)
-                                .build(),
+                                .setAvailableProviders(providers).build(),
                         RC_SIGN_IN);
-                finish();
-            } else {
-                //if (BuildConfig.DEBUG)
-                //  AuthUI.getInstance().signOut(this);
             }
-        });
+        };
+        // set addEntry and summary as tld destinations --> no back button
+        mNavController = Navigation.findNavController(this, R.id.my_nav_host_fragment);
+        Set<Integer> tlds = new HashSet<>();
+        tlds.add(R.id.addExpense_dest);
+        tlds.add(R.id.selectExpense_dest);
+
+
         mAppBarConfiguration = new AppBarConfiguration.Builder(tlds).build();
         setupActionBar(mNavController);
         setupBottomNavMenu(mNavController);
-
     }
+
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -83,17 +81,18 @@ public class MainActivity extends AppCompatActivity {
         if (requestCode == RC_SIGN_IN) {
             IdpResponse response = IdpResponse.fromResultIntent(data);
 
-            if (resultCode == RESULT_OK) {
-                // Successfully signed in
-                mFirebaseUser = FirebaseAuth.getInstance().getCurrentUser();
-                // ...
-            } else {
-                //TODO: make sth. useful
-                // Sign in failed. If response is null the user canceled the
-                // sign-in flow using the back button. Otherwise check
-                // response.getError().getErrorCode() and handle the error.
-                // ...
+            if (response == null) {
+                //TODO: according to the documentation this should happen if back is pressed in
+                // the login activity. But it doesn't seem to work (emulator)
+                finish();
             }
+
+//            if (resultCode == RESULT_OK) {
+//                // Successfully signed in
+//                // ...
+//            }
+
+
         }
     }
 
@@ -134,4 +133,40 @@ public class MainActivity extends AppCompatActivity {
     public boolean onSupportNavigateUp() {
         return mNavController.navigateUp();
     }
+
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.top_menu, menu);
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.action_logout:
+                AuthUI.getInstance().signOut(this);
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        mFirebaseAuth.addAuthStateListener(authStateListener);
+
+
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        mFirebaseAuth.removeAuthStateListener(authStateListener);
+
+    }
+
 }
+
+

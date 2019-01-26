@@ -29,9 +29,9 @@ public class Repository {
     private FirebaseUser mFbUser;
     private FirebaseFirestore mDb;
 
-    public static final String COLLECTION_KEY_USERS = "users";
-    public static final String COLLECTION_KEY_EXPENSE_OVERVIEW = "expenses_overview";
-    public static final String COLLECTION_KEY_EXPENSE = "expenses";
+    private static final String COLLECTION_KEY_USERS = "users";
+    private static final String COLLECTION_KEY_EXPENSE_OVERVIEW = "expenses_overview";
+    private static final String COLLECTION_KEY_EXPENSE = "expenses";
 
     private Repository() {
         mFbUser = FirebaseAuth.getInstance().getCurrentUser();
@@ -74,18 +74,12 @@ public class Repository {
      */
     public void createNewUser() {
         User user = new User();
-        //     user.setName(mFbUser.getDisplayName());
         user.setMail(mFbUser.getEmail());
-//       Map<String, String> shares = new HashMap<>();
-//       shares.put("1111", "1234");
-//       shares.put("2222", "5678");
-//       user.setShares(shares);
         mDb.collection(COLLECTION_KEY_USERS).document(mFbUser.getUid()).set(user);
     }
 
     public void createTestExpense() {
         ExpenseOverview expenseOverview = new ExpenseOverview();
-
         Map<String, String> sharer = new HashMap<>();
         sharer.put(mFbUser.getUid(), "1234");
         expenseOverview.setSharer(sharer);
@@ -95,6 +89,7 @@ public class Repository {
 
 
     public void createTestExpenseOverview() {
+
         Expense expense = new Expense();
         expense.setUserID(mFbUser.getUid());
         expense.setAmount(50.1);

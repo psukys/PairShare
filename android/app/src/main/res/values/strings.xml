@@ -11,5 +11,6 @@
     <string name="label_add_expense">Expense (€):</string>
     <string name="hint_add_how_much_did_you_spend">How much did you spend?</string>
     <string name="bt_add">Add</string>
+    <string name="menu_logout">Log out</string>
 
 </resources>

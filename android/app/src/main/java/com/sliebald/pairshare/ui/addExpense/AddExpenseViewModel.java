@@ -50,8 +50,8 @@ class AddExpenseViewModel extends ViewModel {
                 Log.d(TAG, "get failed with ", task.getException());
             }
         });
-        Repository.getInstance().createTestExpenseOverview();
-        Repository.getInstance().createTestExpense();
+//        Repository.getInstance().createTestExpenseOverview();
+//        Repository.getInstance().createTestExpense();
 
 
     }

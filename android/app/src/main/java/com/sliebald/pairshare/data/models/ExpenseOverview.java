@@ -15,6 +15,8 @@ public class ExpenseOverview {
 
     private Map<String, String> sharer;
 
+    private String name;
+
     public Date getCreated() {
         return created;
     }
@@ -37,5 +39,13 @@ public class ExpenseOverview {
 
     public void setSharer(Map<String, String> sharer) {
         this.sharer = sharer;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 }
