@@ -21,7 +21,21 @@
     <fragment
         android:id="@+id/selectExpense_dest"
         android:name="com.sliebald.pairshare.ui.selectExpenseList.SelectExpenseFragment"
-        android:label="fragment_select_expense"
-        tools:layout="@layout/fragment_select_expense" />
+        android:label="@string/label_select_list"
+        tools:layout="@layout/fragment_select_expense">
+        <action
+            android:id="@+id/action_selectExpense_dest_to_addExpenseListFragment"
+            app:destination="@id/addExpenseList_dest"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/slide_out_right"
+            app:popUpTo="@+id/selectExpense_dest" />
+    </fragment>
+    <fragment
+        android:id="@+id/addExpenseList_dest"
+        android:name="com.sliebald.pairshare.ui.addExpenseList.AddExpenseListFragment"
+        android:label="@string/label_add_expense_list"
+        tools:layout="@layout/fragment_add_expense_list" />
 
 </navigation>

@@ -8,6 +8,7 @@ import java.util.Date;
  * PoJo Object for Users stored in firestore.
  */
 public class User {
+    public static final String KEY_MAIL = "mail";
 
     private String mail;
 
@@ -22,7 +23,7 @@ public class User {
     }
 
     public void setMail(String mail) {
-        this.mail = mail;
+        this.mail = mail.toLowerCase();
     }
 
     public Date getCreated() {

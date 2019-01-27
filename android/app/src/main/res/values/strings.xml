@@ -6,11 +6,18 @@
     <string name="label_summary">Summary</string>
     <string name="label_add_a_comment">Add a comment (optional)</string>
     <string name="hint_add_a_comment">Add a comment describing the expense (optional):</string>
-    <string name="title_add_a_new_expense">Add a new expense:</string>
+    <string name="title_select_active_expense">Select active expense:</string>
     <string name="label_add_time">Time:</string>
     <string name="label_add_expense">Expense (€):</string>
     <string name="hint_add_how_much_did_you_spend">How much did you spend?</string>
     <string name="bt_add">Add</string>
     <string name="menu_logout">Log out</string>
+    <string name="title_add_a_new_expense_list">Create new expense list</string>
+    <string name="label_add_expense_list_name">List name:</string>
+    <string name="hint_add_list_name">Give your shared list a name.</string>
+    <string name="label_add_expense_list_invite">Share with:</string>
+    <string name="hint_add_expense_list_invite">E-mail of the other sharer</string>
+    <string name="label_select_list">Active List</string>
+    <string name="label_add_expense_list">Create new list</string>
 
 </resources>

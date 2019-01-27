@@ -17,6 +17,7 @@ import net.yslibrary.android.keyboardvisibilityevent.KeyboardVisibilityEvent;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -86,6 +87,8 @@ public class MainActivity extends AppCompatActivity {
                 // the login activity. But it doesn't seem to work (emulator)
                 finish();
             }
+//        Repository.getInstance().createTestExpenseOverview();
+//        Repository.getInstance().createTestExpense();
 
 //            if (resultCode == RESULT_OK) {
 //                // Successfully signed in
@@ -109,6 +112,11 @@ public class MainActivity extends AppCompatActivity {
         KeyboardVisibilityEvent.setEventListener(
                 this,
                 isOpen -> {
+                    int activeFragment =
+                            Objects.requireNonNull(navController.getCurrentDestination()).getId();
+                    // in addExpenseList_dest the bottomNav is never shown.
+                    if (activeFragment == R.id.addExpenseList_dest)
+                        return;
                     if (isOpen) {
                         bottomNav.setVisibility(View.GONE);
                     } else {
@@ -156,8 +164,6 @@ public class MainActivity extends AppCompatActivity {
     protected void onStart() {
         super.onStart();
         mFirebaseAuth.addAuthStateListener(authStateListener);
-
-
     }
 
     @Override
