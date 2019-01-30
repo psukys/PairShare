@@ -7,17 +7,26 @@ import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
 class AddExpenseListViewModel extends ViewModel implements Repository.ResultCallback {
-
+//TODO: externalize Strings
 
     private static final String TAG = AddExpenseListViewModel.class.getSimpleName();
 
     private MutableLiveData<String> errorMessage;
+    private MutableLiveData<Boolean> operationSuccessfull;
+
 
     LiveData<String> getErrorMessage() {
         if (errorMessage == null) {
             errorMessage = new MutableLiveData<>();
         }
         return errorMessage;
+    }
+
+    LiveData<Boolean> getOperationSuccessfull() {
+        if (operationSuccessfull == null) {
+            operationSuccessfull = new MutableLiveData<>();
+        }
+        return operationSuccessfull;
     }
 
     void createExpenseList(String listName, String invite) {
@@ -35,10 +44,10 @@ class AddExpenseListViewModel extends ViewModel implements Repository.ResultCall
     public void reportResult(int resultCode) {
         switch (resultCode) {
             case 0:
-                errorMessage.postValue("Code" + resultCode);
+                operationSuccessfull.postValue(true);
                 break;
             default:
-                errorMessage.postValue("Code" + resultCode);
+                errorMessage.postValue("Something went wrong on the server side, try again later.");
         }
     }
 }

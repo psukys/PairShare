@@ -1,7 +1,7 @@
 <resources>
     <string name="app_name">PairShare</string>
     <string name="nav_add">Add</string>
-    <string name="nav_summary">Summary</string>
+    <string name="nav_lists">Lists</string>
     <string name="label_add_entry">Add Entry</string>
     <string name="label_summary">Summary</string>
     <string name="label_add_a_comment">Add a comment (optional)</string>

@@ -3,18 +3,23 @@ package com.sliebald.pairshare.data.models;
 import com.google.firebase.firestore.ServerTimestamp;
 
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 
 public class ExpenseList {
 
+    public static final String KEY_LISTNAME = "listName";
+    public static final String KEY_SHARERS = "sharers";
+    public static final String KEY_SHARER_INFO = "sharerInfo";
+    public static final String KEY_MODIFIED = "modified";
 
     @ServerTimestamp
     private Date created;
     @ServerTimestamp
     private Date modified;
 
-    private Map<String, ExpenseSummary> sharers;
-
+    private Map<String, ExpenseSummary> sharerInfo;
+    private List<String> sharers;
     private String invite;
 
     private String listName;
@@ -36,12 +41,12 @@ public class ExpenseList {
         this.modified = modified;
     }
 
-    public Map<String, ExpenseSummary> getSharers() {
-        return sharers;
+    public Map<String, ExpenseSummary> getSharerInfo() {
+        return sharerInfo;
     }
 
-    public void setSharers(Map<String, ExpenseSummary> sharers) {
-        this.sharers = sharers;
+    public void setSharerInfo(Map<String, ExpenseSummary> sharerInfo) {
+        this.sharerInfo = sharerInfo;
     }
 
     public String getListName() {
@@ -60,4 +65,11 @@ public class ExpenseList {
         this.invite = invite;
     }
 
+    public List<String> getSharers() {
+        return sharers;
+    }
+
+    public void setSharers(List<String> sharers) {
+        this.sharers = sharers;
+    }
 }

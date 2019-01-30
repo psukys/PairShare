@@ -9,6 +9,6 @@
     <item
         android:id="@+id/selectExpense_dest"
         android:icon="@drawable/ic_dashboard_black_24dp"
-        android:title="@string/nav_summary" />
+        android:title="@string/nav_lists" />
 
 </menu>

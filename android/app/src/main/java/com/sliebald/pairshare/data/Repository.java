@@ -9,18 +9,22 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.Query;
 import com.sliebald.pairshare.data.models.Expense;
 import com.sliebald.pairshare.data.models.ExpenseList;
 import com.sliebald.pairshare.data.models.ExpenseSummary;
 import com.sliebald.pairshare.data.models.User;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class Repository {
 
     private static final String COLLECTION_KEY_EXPENSE_LISTS = "expense_lists";
-
+    private static final String COLLECTION_KEY_USERS = "users";
+    private static final String COLLECTION_KEY_EXPENSE = "expenses";
 
     /**
      * Tag for logging.
@@ -33,43 +37,7 @@ public class Repository {
     private FirebaseUser mFbUser;
     private FirebaseFirestore mDb;
 
-    private static final String COLLECTION_KEY_USERS = "users";
 
-    /**
-     * Create a new ExpenseList for the own user and the invited user based on his email.
-     *
-     * @param listName Name of the new {@link ExpenseList}.
-     * @param invite   Email address of the {@link User} that will be invited to the list.
-     * @param callback Returns the result. 0 if operation went through, -1 if the other User
-     *                 wasn't found.
-     */
-    public void createNewExpenseList(String listName, String invite, ResultCallback callback) {
-        ExpenseList expenseList = new ExpenseList();
-        expenseList.setListName(listName);
-        Map<String, ExpenseSummary> sharers = new HashMap<>();
-        ExpenseSummary newSummary = new ExpenseSummary(0, 0.0, 0.0);
-        sharers.put(mFbUser.getUid(), newSummary);
-        expenseList.setSharers(sharers);
-
-        mDb.collection(COLLECTION_KEY_USERS).whereEqualTo(User.KEY_MAIL,
-                invite.toLowerCase()).get().addOnCompleteListener(task -> {
-            if (task.isSuccessful() && task.getResult() != null && !task.getResult().getDocuments().isEmpty()) {
-
-                DocumentSnapshot documentSnapshot = task.getResult().getDocuments().get(0);
-                if (!documentSnapshot.getId().equals(mFbUser.getUid())) {
-                    expenseList.setInvite(documentSnapshot.getId());
-                    mDb.collection(COLLECTION_KEY_EXPENSE_LISTS).add(expenseList)
-                            .addOnSuccessListener(documentReference -> callback.reportResult(0));
-                }
-            } else {
-                //throw exception?
-                callback.reportResult(-1);
-            }
-        });
-
-
-    }
-    private static final String COLLECTION_KEY_EXPENSE = "expenses";
 
     private Repository() {
         mFbUser = FirebaseAuth.getInstance().getCurrentUser();
@@ -131,7 +99,52 @@ public class Repository {
 
     }
 
+    public Query getActiveExpenseListsQuery() {
 
+        return mDb.collection(COLLECTION_KEY_EXPENSE_LISTS)
+                .whereArrayContains(ExpenseList.KEY_SHARERS, mFbUser.getUid())
+                .orderBy(ExpenseList.KEY_MODIFIED)
+                .limit(50);
+    }
+
+
+    /**
+     * Create a new ExpenseList for the own user and the invited user based on his email.
+     *
+     * @param listName Name of the new {@link ExpenseList}.
+     * @param invite   Email address of the {@link User} that will be invited to the list.
+     * @param callback Returns the result. 0 if operation went through, -1 if the other User
+     *                 wasn't found.
+     */
+    public void createNewExpenseList(String listName, String invite, ResultCallback callback) {
+        ExpenseList expenseList = new ExpenseList();
+        expenseList.setListName(listName);
+        List<String> sharers = new ArrayList<>();
+        sharers.add(mFbUser.getUid());
+        expenseList.setSharers(sharers);
+        Map<String, ExpenseSummary> sharerInfo = new HashMap<>();
+        ExpenseSummary newSummary = new ExpenseSummary(0, 0.0, 0.0);
+        sharerInfo.put(mFbUser.getUid(), newSummary);
+        expenseList.setSharerInfo(sharerInfo);
+
+        mDb.collection(COLLECTION_KEY_USERS).whereEqualTo(User.KEY_MAIL,
+                invite.toLowerCase()).get().addOnCompleteListener(task -> {
+            if (task.isSuccessful() && task.getResult() != null && !task.getResult().getDocuments().isEmpty()) {
+
+                DocumentSnapshot documentSnapshot = task.getResult().getDocuments().get(0);
+                if (!documentSnapshot.getId().equals(mFbUser.getUid())) {
+                    expenseList.setInvite(documentSnapshot.getId());
+                    mDb.collection(COLLECTION_KEY_EXPENSE_LISTS).add(expenseList)
+                            .addOnSuccessListener(documentReference -> callback.reportResult(0));
+                }
+            } else {
+                //throw exception?
+                callback.reportResult(-1);
+            }
+        });
+
+
+    }
     public interface ResultCallback {
         void reportResult(int resultCode);
     }

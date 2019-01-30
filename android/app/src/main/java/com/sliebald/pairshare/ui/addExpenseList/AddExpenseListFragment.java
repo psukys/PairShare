@@ -16,6 +16,8 @@ import androidx.annotation.Nullable;
 import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProviders;
+import androidx.navigation.NavController;
+import androidx.navigation.Navigation;
 
 public class AddExpenseListFragment extends Fragment {
 
@@ -48,7 +50,16 @@ public class AddExpenseListFragment extends Fragment {
                         Snackbar.LENGTH_SHORT).show());
         mBinding.button.setOnClickListener(v -> mViewModel.createExpenseList(mBinding.etAddExpenseListName.getText().toString(),
                 mBinding.etAddExpenseListInvite.getText().toString()));
+        NavController navController =
+                Navigation.findNavController(Objects.requireNonNull(this.getView()));
 
+        mViewModel.getOperationSuccessfull().observe(this, successfull -> {
+            if (successfull) {
+                Snackbar.make(Objects.requireNonNull(getActivity()).findViewById(R.id.main_layout),
+                        "Added new List", Snackbar.LENGTH_SHORT).show();
+                navController.navigateUp();
+            }
+        });
 
     }
 
