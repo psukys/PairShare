@@ -10,6 +10,7 @@ public class ExpenseList {
 
     public static final String KEY_LISTNAME = "listName";
     public static final String KEY_SHARERS = "sharers";
+    public static final String KEY_INVITE = "invite";
     public static final String KEY_SHARER_INFO = "sharerInfo";
     public static final String KEY_MODIFIED = "modified";
 

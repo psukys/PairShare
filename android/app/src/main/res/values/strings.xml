@@ -19,5 +19,6 @@
     <string name="hint_add_expense_list_invite">E-mail of the other sharer</string>
     <string name="label_select_list">Active List</string>
     <string name="label_add_expense_list">Create new list</string>
+    <string name="title_invited_lists">Invited Lists</string>
 
 </resources>

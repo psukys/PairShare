@@ -6,11 +6,8 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.firebase.ui.firestore.FirestoreRecyclerAdapter;
-import com.firebase.ui.firestore.FirestoreRecyclerOptions;
-import com.google.firebase.firestore.Query;
 import com.sliebald.pairshare.R;
 import com.sliebald.pairshare.data.Repository;
-import com.sliebald.pairshare.data.models.ExpenseList;
 import com.sliebald.pairshare.databinding.FragmentSelectExpenseListBinding;
 
 import androidx.annotation.NonNull;
@@ -24,6 +21,9 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 public class SelectExpenseListFragment extends Fragment {
 
     private SelectExpenseListViewModel mViewModel;
+
+    private FirestoreRecyclerAdapter expenseListsAdapter;
+    private FirestoreRecyclerAdapter penndingInvitationListAdapter;
 
     /**
      * Databinding of the corresponding fragment layout.
@@ -46,33 +46,32 @@ public class SelectExpenseListFragment extends Fragment {
         mViewModel = ViewModelProviders.of(this).get(SelectExpenseListViewModel.class);
 
 
-        Query query = Repository.getInstance().getActiveExpenseListsQuery();
+        penndingInvitationListAdapter = Repository.getInstance().getPendingInvitationListsQuery();
+        mBinding.rvInvitedLists.setAdapter(penndingInvitationListAdapter);
+        mBinding.rvInvitedLists.setLayoutManager(new LinearLayoutManager(getContext()));
 
-        FirestoreRecyclerOptions<ExpenseList> options =
-                new FirestoreRecyclerOptions.Builder<ExpenseList>()
-                        .setQuery(query, ExpenseList.class)
-                        .setLifecycleOwner(this)
-                        .build();
 
-        FirestoreRecyclerAdapter adapter = new FirestoreRecyclerAdapter<ExpenseList,
-                ExpenseListHolder>(options) {
-            @Override
-            public void onBindViewHolder(ExpenseListHolder holder, int position,
-                                         @NonNull ExpenseList expenseList) {
-                holder.bind(expenseList);
-            }
+        expenseListsAdapter = Repository.getInstance().getExpenseListsAdapter();
 
-            @Override
-            public ExpenseListHolder onCreateViewHolder(ViewGroup group, int i) {
-                View view = LayoutInflater.from(group.getContext())
-                        .inflate(R.layout.recycler_item_expense_list, group, false);
-                return new ExpenseListHolder(view);
-            }
-        };
+        mBinding.rvActiveLists.setAdapter(expenseListsAdapter);
+        mBinding.rvActiveLists.setLayoutManager(new LinearLayoutManager(getContext()));
 
-        mBinding.rvActiveExpense.setAdapter(adapter);
-        LinearLayoutManager manager = new LinearLayoutManager(getContext());
-        mBinding.rvActiveExpense.setLayoutManager(manager);
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        penndingInvitationListAdapter.startListening();
+        expenseListsAdapter.startListening();
+
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        penndingInvitationListAdapter.stopListening();
+        expenseListsAdapter.stopListening();
+
     }
 
 

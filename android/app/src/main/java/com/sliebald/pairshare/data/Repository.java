@@ -2,7 +2,12 @@ package com.sliebald.pairshare.data;
 
 import android.annotation.SuppressLint;
 import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
 
+import com.firebase.ui.firestore.FirestoreRecyclerAdapter;
+import com.firebase.ui.firestore.FirestoreRecyclerOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -10,15 +15,19 @@ import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
+import com.sliebald.pairshare.R;
 import com.sliebald.pairshare.data.models.Expense;
 import com.sliebald.pairshare.data.models.ExpenseList;
 import com.sliebald.pairshare.data.models.ExpenseSummary;
 import com.sliebald.pairshare.data.models.User;
+import com.sliebald.pairshare.ui.selectExpenseList.ExpenseListHolder;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import androidx.annotation.NonNull;
 
 public class Repository {
 
@@ -99,14 +108,85 @@ public class Repository {
 
     }
 
-    public Query getActiveExpenseListsQuery() {
+    /**
+     * Gets a {@link FirestoreRecyclerAdapter} that listens on active {@link ExpenseList}s of the
+     * current user. The calling Fragment or activity has to manage the related lifecycle
+     * operations (adapter.startListening() in onStart() and adapter.stopListening in onStop)
+     *
+     * @return The {@link FirestoreRecyclerAdapter} to connect with a
+     * {@link androidx.recyclerview.widget.RecyclerView}.
+     */
+    public FirestoreRecyclerAdapter getExpenseListsAdapter() {
 
-        return mDb.collection(COLLECTION_KEY_EXPENSE_LISTS)
+        Query query = mDb.collection(COLLECTION_KEY_EXPENSE_LISTS)
                 .whereArrayContains(ExpenseList.KEY_SHARERS, mFbUser.getUid())
                 .orderBy(ExpenseList.KEY_MODIFIED)
                 .limit(50);
+
+        FirestoreRecyclerOptions<ExpenseList> options =
+                new FirestoreRecyclerOptions.Builder<ExpenseList>()
+                        .setQuery(query, ExpenseList.class)
+                        .build();
+
+        return new FirestoreRecyclerAdapter<ExpenseList,
+                ExpenseListHolder>(options) {
+            @Override
+            public void onBindViewHolder(@NonNull ExpenseListHolder holder, int position,
+                                         @NonNull ExpenseList expenseList) {
+                holder.bind(expenseList);
+            }
+
+            @NonNull
+            @Override
+            public ExpenseListHolder onCreateViewHolder(@NonNull ViewGroup group, int i) {
+                View view = LayoutInflater.from(group.getContext())
+                        .inflate(R.layout.recycler_item_expense_list, group, false);
+                return new ExpenseListHolder(view);
+            }
+        };
     }
 
+
+    /**
+     * Gets a {@link FirestoreRecyclerAdapter} that listens on invitations for {@link ExpenseList}
+     * s of the current user. The calling Fragment or activity has to manage the related
+     * lifecycle operations (adapter.startListening() in onStart() and adapter.stopListening in
+     * onStop)
+     *
+     * @return The {@link FirestoreRecyclerAdapter} to connect with a
+     * {@link androidx.recyclerview.widget.RecyclerView}.
+     */
+    public FirestoreRecyclerAdapter getPendingInvitationListsQuery() {
+
+        Query query = mDb.collection(COLLECTION_KEY_EXPENSE_LISTS)
+                .whereEqualTo(ExpenseList.KEY_INVITE, mFbUser.getUid())
+                .orderBy(ExpenseList.KEY_MODIFIED)
+                .limit(50);
+
+        FirestoreRecyclerOptions<ExpenseList> options =
+                new FirestoreRecyclerOptions.Builder<ExpenseList>()
+                        .setQuery(query, ExpenseList.class)
+                        .build();
+
+        return new FirestoreRecyclerAdapter<ExpenseList,
+                ExpenseListHolder>(options) {
+            @Override
+            public void onBindViewHolder(@NonNull ExpenseListHolder holder, int position,
+                                         @NonNull ExpenseList expenseList) {
+                holder.bind(expenseList);
+            }
+
+            //TODO: adapt viewholderlayout
+            @NonNull
+            @Override
+            public ExpenseListHolder onCreateViewHolder(@NonNull ViewGroup group, int i) {
+                View view = LayoutInflater.from(group.getContext())
+                        .inflate(R.layout.recycler_item_expense_list, group, false);
+                return new ExpenseListHolder(view);
+            }
+        };
+
+    }
 
     /**
      * Create a new ExpenseList for the own user and the invited user based on his email.

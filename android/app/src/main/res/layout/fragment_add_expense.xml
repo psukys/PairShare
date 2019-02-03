@@ -14,7 +14,7 @@
             android:focusableInTouchMode="true">
 
             <TextView
-                android:id="@+id/tv_title_add"
+                android:id="@+id/tv_title_activeLists"
                 style="@style/title"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -31,7 +31,7 @@
                 android:layout_height="wrap_content"
                 android:text="@string/label_add_time"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/tv_title_add" />
+                app:layout_constraintTop_toBottomOf="@+id/tv_title_activeLists" />
 
 
             <EditText
