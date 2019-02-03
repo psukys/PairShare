@@ -1,17 +1,44 @@
 package com.sliebald.pairshare.utils;
 
-import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 
 import com.sliebald.pairshare.MyApplication;
 
-class PreferenceUtils {
-    private static final String PREFERENCE_KEY_SELECTED_EXPENSE = "PREFERENCE_KEY_SELECTED_EXPENSE";
+public class PreferenceUtils {
+    public static final String PREFERENCE_KEY_SELECTED_EXPENSE = "PREFERENCE_KEY_SELECTED_LIST";
 
-    static String getSelectedSharedExpense() {
-        Context context = MyApplication.getContext();
-        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
-        return preferences.getString(PREFERENCE_KEY_SELECTED_EXPENSE, null);
+    /**
+     * Returns the id of the currently selected shared expense list. Returns null if none was
+     * ever selected.
+     *
+     * @return The id of the currently selected expense.
+     */
+    public static String getSelectedSharedExpenseListID() {
+        return PreferenceManager.getDefaultSharedPreferences(MyApplication.getContext())
+                .getString(PREFERENCE_KEY_SELECTED_EXPENSE, null);
     }
+
+    /**
+     * Sets the id of the currently selected shared expense list.
+     *
+     * @param listID The id of the list that is currently selected.
+     */
+    public static void setSelectedSharedExpenseListID(String listID) {
+        SharedPreferences preferences =
+                PreferenceManager.getDefaultSharedPreferences(MyApplication.getContext());
+        SharedPreferences.Editor editor = preferences.edit();
+        editor.putString(PREFERENCE_KEY_SELECTED_EXPENSE, listID);
+        editor.apply();
+
+    }
+
+    public static void registerSelectedListChangedListener(SharedPreferences.OnSharedPreferenceChangeListener listener) {
+        PreferenceManager.getDefaultSharedPreferences(MyApplication.getContext()).registerOnSharedPreferenceChangeListener(listener);
+    }
+
+    public static void unregisterSelectedListChangedListener(SharedPreferences.OnSharedPreferenceChangeListener listener) {
+        PreferenceManager.getDefaultSharedPreferences(MyApplication.getContext()).unregisterOnSharedPreferenceChangeListener(listener);
+    }
+
 }

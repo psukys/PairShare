@@ -21,6 +21,7 @@ import com.sliebald.pairshare.data.models.ExpenseList;
 import com.sliebald.pairshare.data.models.ExpenseSummary;
 import com.sliebald.pairshare.data.models.User;
 import com.sliebald.pairshare.ui.selectExpenseList.ExpenseListHolder;
+import com.sliebald.pairshare.ui.selectExpenseList.InviteListHolder;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -133,7 +134,7 @@ public class Repository {
             @Override
             public void onBindViewHolder(@NonNull ExpenseListHolder holder, int position,
                                          @NonNull ExpenseList expenseList) {
-                holder.bind(expenseList);
+                holder.bind(expenseList, getSnapshots().getSnapshot(position).getId());
             }
 
             @NonNull
@@ -169,20 +170,20 @@ public class Repository {
                         .build();
 
         return new FirestoreRecyclerAdapter<ExpenseList,
-                ExpenseListHolder>(options) {
+                InviteListHolder>(options) {
             @Override
-            public void onBindViewHolder(@NonNull ExpenseListHolder holder, int position,
+            public void onBindViewHolder(@NonNull InviteListHolder holder, int position,
                                          @NonNull ExpenseList expenseList) {
-                holder.bind(expenseList);
+                holder.bind(expenseList, getSnapshots().getSnapshot(position).getId());
             }
 
             //TODO: adapt viewholderlayout
             @NonNull
             @Override
-            public ExpenseListHolder onCreateViewHolder(@NonNull ViewGroup group, int i) {
+            public InviteListHolder onCreateViewHolder(@NonNull ViewGroup group, int i) {
                 View view = LayoutInflater.from(group.getContext())
                         .inflate(R.layout.recycler_item_expense_list, group, false);
-                return new ExpenseListHolder(view);
+                return new InviteListHolder(view);
             }
         };
 
