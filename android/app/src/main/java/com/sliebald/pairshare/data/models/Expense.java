@@ -13,6 +13,7 @@ public class Expense {
     private String userID;
     private double amount;
     private String comment;
+    private Date timeOfExpense;
 
     public Date getCreated() {
         return created;
@@ -45,5 +46,13 @@ public class Expense {
 
     public void setComment(String comment) {
         this.comment = comment;
+    }
+
+    public Date getTimeOfExpense() {
+        return timeOfExpense;
+    }
+
+    public void setTimeOfExpense(Date timeOfExpense) {
+        this.timeOfExpense = timeOfExpense;
     }
 }

@@ -12,7 +12,7 @@ class AddExpenseListViewModel extends ViewModel implements Repository.ResultCall
     private static final String TAG = AddExpenseListViewModel.class.getSimpleName();
 
     private MutableLiveData<String> errorMessage;
-    private MutableLiveData<Boolean> operationSuccessfull;
+    private MutableLiveData<Boolean> operationSuccessful;
 
 
     LiveData<String> getErrorMessage() {
@@ -22,11 +22,11 @@ class AddExpenseListViewModel extends ViewModel implements Repository.ResultCall
         return errorMessage;
     }
 
-    LiveData<Boolean> getOperationSuccessfull() {
-        if (operationSuccessfull == null) {
-            operationSuccessfull = new MutableLiveData<>();
+    LiveData<Boolean> getOperationSuccessful() {
+        if (operationSuccessful == null) {
+            operationSuccessful = new MutableLiveData<>();
         }
-        return operationSuccessfull;
+        return operationSuccessful;
     }
 
     void createExpenseList(String listName, String invite) {
@@ -44,7 +44,7 @@ class AddExpenseListViewModel extends ViewModel implements Repository.ResultCall
     public void reportResult(int resultCode) {
         switch (resultCode) {
             case 0:
-                operationSuccessfull.postValue(true);
+                operationSuccessful.postValue(true);
                 break;
             default:
                 errorMessage.postValue("Something went wrong on the server side, try again later.");

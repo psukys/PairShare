@@ -53,8 +53,8 @@ public class AddExpenseListFragment extends Fragment {
         NavController navController =
                 Navigation.findNavController(Objects.requireNonNull(this.getView()));
 
-        mViewModel.getOperationSuccessfull().observe(this, successfull -> {
-            if (successfull) {
+        mViewModel.getOperationSuccessful().observe(this, successful -> {
+            if (successful) {
                 Snackbar.make(Objects.requireNonNull(getActivity()).findViewById(R.id.main_layout),
                         "Added new List", Snackbar.LENGTH_SHORT).show();
                 navController.navigateUp();

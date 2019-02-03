@@ -1,20 +1,37 @@
 package com.sliebald.pairshare.ui.addExpense;
 
-import android.util.Log;
-
-import com.google.firebase.firestore.DocumentSnapshot;
 import com.sliebald.pairshare.data.Repository;
+import com.sliebald.pairshare.data.models.Expense;
 
 import java.util.Calendar;
+import java.util.Objects;
 
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
-class AddExpenseViewModel extends ViewModel {
+class AddExpenseViewModel extends ViewModel implements Repository.ResultCallback {
     private static final String TAG = AddExpenseViewModel.class.getSimpleName();
 
     private MutableLiveData<Calendar> calendar;
+
+    private MutableLiveData<String> errorMessage;
+    private MutableLiveData<Boolean> operationSuccessful;
+
+
+    LiveData<String> getErrorMessage() {
+        if (errorMessage == null) {
+            errorMessage = new MutableLiveData<>();
+        }
+        return errorMessage;
+    }
+
+    LiveData<Boolean> getOperationSuccessful() {
+        if (operationSuccessful == null) {
+            operationSuccessful = new MutableLiveData<>();
+        }
+        return operationSuccessful;
+    }
 
     LiveData<Calendar> getCalendar() {
         if (calendar == null) {
@@ -24,6 +41,13 @@ class AddExpenseViewModel extends ViewModel {
         return calendar;
     }
 
+    /**
+     * Updates the calendar with the given year/month/day
+     *
+     * @param year       Year to set.
+     * @param month      Month to set.
+     * @param dayOfMonth Day to set.
+     */
     void setDate(int year, int month, int dayOfMonth) {
         Calendar cal = calendar.getValue();
         if (cal != null) {
@@ -32,24 +56,21 @@ class AddExpenseViewModel extends ViewModel {
         }
     }
 
-    /**
-     * Get the current User.
-     */
-    void getUser() {
+    void addExpense(Double amount, String comment) {
+        Expense expense = new Expense();
+        expense.setComment(comment);
+        expense.setAmount(amount);
+        expense.setTimeOfExpense(Objects.requireNonNull(calendar.getValue()).getTime());
+        Repository.getInstance().addExpense(expense, this);
+    }
 
-        Repository.getInstance().getCurrentUser(task -> {
-            if (task.isSuccessful()) {
-                DocumentSnapshot document = task.getResult();
-                if (document != null && document.exists()) {
-                    Log.d(TAG, "DocumentSnapshot data: " + document.getData());
-                } else {
-                    Repository.getInstance().createNewUser();
-                    Log.d(TAG, "No such document");
-                }
-            } else {
-                Log.d(TAG, "get failed with ", task.getException());
-            }
-        });
+    @Override
+    public void reportResult(int resultCode) {
+        if (resultCode == 0) {
+            operationSuccessful.postValue(true);
+        } else if (resultCode == -1) {
+            errorMessage.postValue("Could not add expense to list, try again later.");
+        }
     }
 
 }

@@ -22,6 +22,7 @@ import com.sliebald.pairshare.data.models.ExpenseSummary;
 import com.sliebald.pairshare.data.models.User;
 import com.sliebald.pairshare.ui.selectExpenseList.ExpenseListHolder;
 import com.sliebald.pairshare.ui.selectExpenseList.InviteListHolder;
+import com.sliebald.pairshare.utils.PreferenceUtils;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -226,6 +227,23 @@ public class Repository {
 
 
     }
+
+    /**
+     * Adds the given expense to the currently selected List. Adds the ID of the currently logged
+     * in user.
+     *
+     * @param expense  The {@link Expense} to add.
+     * @param callback Called with resultcode 0 once successful, resultcode -1 in an error case.
+     */
+    public void addExpense(Expense expense, ResultCallback callback) {
+        expense.setUserID(mFbUser.getUid());
+        mDb.collection(COLLECTION_KEY_EXPENSE_LISTS).document(PreferenceUtils.
+                getSelectedSharedExpenseListID()).collection(COLLECTION_KEY_EXPENSE).add(expense)
+                .addOnSuccessListener(documentReference -> callback.reportResult(0))
+                .addOnFailureListener(documentReference -> callback.reportResult(-1));
+
+    }
+
     public interface ResultCallback {
         void reportResult(int resultCode);
     }
