@@ -49,7 +49,6 @@ public class Repository {
     private FirebaseFirestore mDb;
 
 
-
     private Repository() {
         mFbUser = FirebaseAuth.getInstance().getCurrentUser();
         mDb = FirebaseFirestore.getInstance();

@@ -6,6 +6,4 @@ class SelectExpenseListViewModel extends ViewModel {
     private static final String TAG = SelectExpenseListViewModel.class.getSimpleName();
 
 
-
-
 }

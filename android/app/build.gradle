@@ -34,12 +34,12 @@ dependencies {
     androidTestImplementation 'androidx.test:runner:1.1.1'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.1.1'
 
-    implementation 'androidx.appcompat:appcompat:1.1.0-alpha01'
+    implementation 'androidx.appcompat:appcompat:1.1.0-alpha02'
     implementation 'com.google.android.material:material:1.0.0'
     implementation 'androidx.constraintlayout:constraintlayout:2.0.0-alpha3'
     // Navigation
-    implementation 'android.arch.navigation:navigation-fragment:1.0.0-alpha11'
-    implementation 'android.arch.navigation:navigation-ui:1.0.0-alpha11'
+    implementation 'android.arch.navigation:navigation-fragment:1.0.0-beta02'
+    implementation 'android.arch.navigation:navigation-ui:1.0.0-beta02'
 
     // Keyboard event listener
     // https://github.com/yshrsmz/KeyboardVisibilityEvent
@@ -50,7 +50,7 @@ dependencies {
     // firebase authentication
     implementation 'com.google.firebase:firebase-auth:16.1.0'
     // firestore database
-    implementation 'com.google.firebase:firebase-firestore:18.0.0'
+    implementation 'com.google.firebase:firebase-firestore:18.0.1'
     // firebase ui
     // https://github.com/firebase/FirebaseUI-Android
     implementation 'com.firebaseui:firebase-ui-auth:4.3.1'
