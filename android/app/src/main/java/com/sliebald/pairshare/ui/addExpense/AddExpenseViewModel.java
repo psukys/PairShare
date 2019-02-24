@@ -56,6 +56,12 @@ class AddExpenseViewModel extends ViewModel implements Repository.ResultCallback
         }
     }
 
+    /**
+     * Add an expense to the currently selected list.
+     *
+     * @param amount  Amount of money spent.
+     * @param comment Comment for the expense (e.g. reason).
+     */
     void addExpense(Double amount, String comment) {
         Expense expense = new Expense();
         expense.setComment(comment);

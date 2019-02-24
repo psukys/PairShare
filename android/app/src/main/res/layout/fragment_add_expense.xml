@@ -15,11 +15,11 @@
             android:focusableInTouchMode="true">
 
             <TextView
-                android:id="@+id/tv_title_activeLists"
+                android:id="@+id/tv_title_addExpense"
                 style="@style/title"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@string/title_select_active_expense"
+                android:text="@string/title_add_a_new"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="1.0"
                 app:layout_constraintStart_toStartOf="parent"
@@ -32,7 +32,7 @@
                 android:layout_height="wrap_content"
                 android:text="@string/label_add_time"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/tv_title_activeLists" />
+                app:layout_constraintTop_toBottomOf="@+id/tv_title_addExpense" />
 
 
             <EditText

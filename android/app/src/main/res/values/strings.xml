@@ -20,5 +20,6 @@
     <string name="label_select_list">Active List</string>
     <string name="label_add_expense_list">Create new list</string>
     <string name="title_invited_lists">Invited Lists</string>
+    <string name="title_add_a_new">Add new Expense:</string>
 
 </resources>

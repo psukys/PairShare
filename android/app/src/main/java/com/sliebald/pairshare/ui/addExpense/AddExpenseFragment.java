@@ -77,7 +77,6 @@ public class AddExpenseFragment extends Fragment {
         mViewModel.getOperationSuccessful().observe(this, successful -> {
             if (successful) {
                 mBinding.etAddComment.getText().clear();
-                mBinding.etAddDate.getText().clear();
                 mBinding.etAddExpense.getText().clear();
                 Snackbar.make(mBinding.clAddExpenseLayout,
                         "Added expense to list", Snackbar.LENGTH_SHORT).show();
