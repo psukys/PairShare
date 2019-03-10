@@ -5,10 +5,10 @@ admin.initializeApp();
 const db = admin.firestore();
 
 // updates the Info/summary of expenses for a list whenever a new expense is added
-exports.updateExpenseSharerInfo = functions.firestore
+exports.updateExpenseSharerInfo = functions.runWith({ memory: "128MB", timeoutSeconds: 30 }).firestore
   .document('expense_lists/{listId}/expenses/{expenseId}')
   .onCreate((snapshot, context) => {
-
+    //TODO: optional enable retries if function fails in firebase console.
     const eventId = context.eventId;
     // Added amount.
     const amount = snapshot.data().amount;
@@ -55,8 +55,11 @@ exports.updateExpenseSharerInfo = functions.firestore
         var newSumExpenses = sharerInfo.sumExpenses + amount;
         var newAvgExpenses = newSumExpenses / newNumExpenses;
 
+        //Set the server timestamp
+        var ts = admin.firestore.FieldValue.serverTimestamp();
         // Update info
         return transaction.set(listRef, {
+          modified: ts,
           lastFunctionsUpdateIDs: lastUpdates,
           sharerInfo: { [userId]: { avgExpenses: newAvgExpenses, numExpenses: newNumExpenses, sumExpenses: newSumExpenses } }
         }, { merge: true, });
