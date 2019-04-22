@@ -6,6 +6,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import androidx.annotation.NonNull;
+
 import com.firebase.ui.firestore.FirestoreRecyclerAdapter;
 import com.firebase.ui.firestore.FirestoreRecyclerOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -28,8 +30,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import androidx.annotation.NonNull;
 
 public class Repository {
 
@@ -87,11 +87,22 @@ public class Repository {
 
     /**
      * Creates a new entry for the currently logged in User in Firestore.
+     * If the user already exists, nothing is changed.
      */
-    public void createNewUser() {
+    public void checkNewUser() {
         User user = new User();
         user.setMail(mFbUser.getEmail());
-        mDb.collection(COLLECTION_KEY_USERS).document(mFbUser.getUid()).set(user);
+        String id = mFbUser.getUid();
+
+        mDb.collection(COLLECTION_KEY_USERS).document(id).get().addOnCompleteListener(task -> {
+            if (task.isSuccessful()) {
+                DocumentSnapshot document = task.getResult();
+                if (document != null && !document.exists()) {
+                    mDb.collection(COLLECTION_KEY_USERS).document(id).set(user);
+                }
+            }
+        });
+
     }
 
     public void createTestExpenseOverview() {
@@ -121,8 +132,7 @@ public class Repository {
 
         Query query = mDb.collection(COLLECTION_KEY_EXPENSE_LISTS)
                 .whereArrayContains(ExpenseList.KEY_SHARERS, mFbUser.getUid())
-                .orderBy(ExpenseList.KEY_MODIFIED)
-                .limit(50);
+                .orderBy(ExpenseList.KEY_MODIFIED);
 
         FirestoreRecyclerOptions<ExpenseList> options =
                 new FirestoreRecyclerOptions.Builder<ExpenseList>()
@@ -135,6 +145,7 @@ public class Repository {
             public void onBindViewHolder(@NonNull ExpenseListHolder holder, int position,
                                          @NonNull ExpenseList expenseList) {
                 holder.bind(expenseList, getSnapshots().getSnapshot(position).getId());
+                Log.d("1234", "" + expenseList);
             }
 
             @NonNull
@@ -161,8 +172,7 @@ public class Repository {
 
         Query query = mDb.collection(COLLECTION_KEY_EXPENSE_LISTS)
                 .whereEqualTo(ExpenseList.KEY_INVITE, mFbUser.getUid())
-                .orderBy(ExpenseList.KEY_MODIFIED)
-                .limit(50);
+                .orderBy(ExpenseList.KEY_MODIFIED);
 
         FirestoreRecyclerOptions<ExpenseList> options =
                 new FirestoreRecyclerOptions.Builder<ExpenseList>()
@@ -177,7 +187,6 @@ public class Repository {
                 holder.bind(expenseList, getSnapshots().getSnapshot(position).getId());
             }
 
-            //TODO: adapt viewholderlayout
             @NonNull
             @Override
             public InviteListHolder onCreateViewHolder(@NonNull ViewGroup group, int i) {
@@ -236,6 +245,7 @@ public class Repository {
      */
     public void addExpense(Expense expense, ResultCallback callback) {
         expense.setUserID(mFbUser.getUid());
+        Log.d(TAG, PreferenceUtils.getSelectedSharedExpenseListID());
         mDb.collection(COLLECTION_KEY_EXPENSE_LISTS).document(PreferenceUtils.
                 getSelectedSharedExpenseListID()).collection(COLLECTION_KEY_EXPENSE).add(expense)
                 .addOnSuccessListener(documentReference -> callback.reportResult(0))

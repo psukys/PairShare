@@ -10,10 +10,21 @@ import java.util.Date;
 public class User {
     public static final String KEY_MAIL = "mail";
 
+    /**
+     * Email address of the User.
+     */
     private String mail;
 
+
+    /**
+     * Time the user was created.
+     */
     @ServerTimestamp
     private Date created;
+
+    /**
+     * Time the user was modified.
+     */
     @ServerTimestamp
     private Date modified;
 
@@ -41,4 +52,5 @@ public class User {
     public void setModified(Date modified) {
         this.modified = modified;
     }
+
 }

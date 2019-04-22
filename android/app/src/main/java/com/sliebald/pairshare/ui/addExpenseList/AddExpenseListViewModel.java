@@ -1,10 +1,10 @@
 package com.sliebald.pairshare.ui.addExpenseList;
 
-import com.sliebald.pairshare.data.Repository;
-
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
+
+import com.sliebald.pairshare.data.Repository;
 
 class AddExpenseListViewModel extends ViewModel implements Repository.ResultCallback {
 //TODO: externalize Strings
@@ -14,7 +14,11 @@ class AddExpenseListViewModel extends ViewModel implements Repository.ResultCall
     private MutableLiveData<String> errorMessage;
     private MutableLiveData<Boolean> operationSuccessful;
 
-
+    /**
+     * Livedata exposing error messages to the view in case an error occurred.
+     *
+     * @return Error message as String.
+     */
     LiveData<String> getErrorMessage() {
         if (errorMessage == null) {
             errorMessage = new MutableLiveData<>();
@@ -22,6 +26,11 @@ class AddExpenseListViewModel extends ViewModel implements Repository.ResultCall
         return errorMessage;
     }
 
+    /**
+     * {@link Boolean} {@link LiveData} to indicate an operation was successful.
+     *
+     * @return
+     */
     LiveData<Boolean> getOperationSuccessful() {
         if (operationSuccessful == null) {
             operationSuccessful = new MutableLiveData<>();
@@ -47,7 +56,7 @@ class AddExpenseListViewModel extends ViewModel implements Repository.ResultCall
                 operationSuccessful.postValue(true);
                 break;
             default:
-                errorMessage.postValue("Something went wrong on the server side, try again later.");
+                errorMessage.postValue("The user you want to share with doesn't exist.");
         }
     }
 }

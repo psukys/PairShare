@@ -6,6 +6,14 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+import androidx.lifecycle.ViewModelProviders;
+import androidx.navigation.NavController;
+import androidx.navigation.Navigation;
+import androidx.navigation.ui.AppBarConfiguration;
+import androidx.navigation.ui.NavigationUI;
+
 import com.firebase.ui.auth.AuthUI;
 import com.firebase.ui.auth.IdpResponse;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
@@ -19,13 +27,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
-
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
-import androidx.navigation.NavController;
-import androidx.navigation.Navigation;
-import androidx.navigation.ui.AppBarConfiguration;
-import androidx.navigation.ui.NavigationUI;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -41,12 +42,15 @@ public class MainActivity extends AppCompatActivity {
     private FirebaseAuth mFirebaseAuth;
     private FirebaseAuth.AuthStateListener authStateListener;
 
+    private MainActivityViewModel mViewModel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        mViewModel = ViewModelProviders.of(this).get(MainActivityViewModel.class);
 
+        //Log user in if he isn't already logged in.
         mFirebaseAuth = FirebaseAuth.getInstance();
         authStateListener = firebaseAuth -> {
             FirebaseUser firebaseUser = firebaseAuth.getCurrentUser();
@@ -85,15 +89,14 @@ public class MainActivity extends AppCompatActivity {
             if (response == null) {
                 //TODO: according to the documentation this should happen if back is pressed in
                 // the login activity. But it doesn't seem to work (emulator)
+                // possible that a new login form is started before this is called and then
+                // finish is called once a login is successful
                 finish();
             }
-//        Repository.getInstance().createTestExpenseOverview();
-//        Repository.getInstance().createTestExpense();
 
-//            if (resultCode == RESULT_OK) {
-//                // Successfully signed in
-//                // ...
-//            }
+            if (resultCode == RESULT_OK) {
+                mViewModel.userLoggedIn();
+            }
 
 
         }
@@ -139,7 +142,7 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public boolean onSupportNavigateUp() {
-        return mNavController.navigateUp();
+        return NavigationUI.navigateUp(mNavController, mAppBarConfiguration);
     }
 
 
