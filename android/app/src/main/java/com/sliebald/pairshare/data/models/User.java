@@ -8,49 +8,42 @@ import java.util.Date;
  * PoJo Object for Users stored in firestore.
  */
 public class User {
+    /**
+     * Firestore key for accessing the mail address of an {@link User}.
+     */
     public static final String KEY_MAIL = "mail";
 
     /**
-     * Email address of the User.
+     * Email address of the {@link User}.
      */
     private String mail;
 
-
     /**
-     * Time the user was created.
+     * Time the {@link User} was created.
      */
     @ServerTimestamp
     private Date created;
 
     /**
-     * Time the user was modified.
+     * Time the {@link User} was modified.
      */
     @ServerTimestamp
     private Date modified;
 
-
+    /**
+     * Get the mail address of the {@link User}.
+     * @return mail address as String.
+     */
     public String getMail() {
         return mail;
     }
 
+    /**
+     * Set the mail address of the {@link User}.
+     * @param mail New mail address as String.
+     */
     public void setMail(String mail) {
         this.mail = mail.toLowerCase();
-    }
-
-    public Date getCreated() {
-        return created;
-    }
-
-    public void setCreated(Date created) {
-        this.created = created;
-    }
-
-    public Date getModified() {
-        return modified;
-    }
-
-    public void setModified(Date modified) {
-        this.modified = modified;
     }
 
 }
