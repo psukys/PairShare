@@ -6,6 +6,12 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.databinding.DataBindingUtil;
+import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProviders;
+
 import com.google.android.material.snackbar.Snackbar;
 import com.sliebald.pairshare.R;
 import com.sliebald.pairshare.databinding.FragmentAddExpenseBinding;
@@ -16,12 +22,6 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Locale;
 import java.util.Objects;
-
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.databinding.DataBindingUtil;
-import androidx.fragment.app.Fragment;
-import androidx.lifecycle.ViewModelProviders;
 
 /**
  * The {@link AddExpenseFragment} gives users the option to add new expenses to the currently
@@ -65,7 +65,12 @@ public class AddExpenseFragment extends Fragment {
             try {
                 Double amount = Double.valueOf(mBinding.etAddExpense.getText().toString());
                 mViewModel.addExpense(amount, mBinding.etAddComment.getText().toString());
-
+                Snackbar.make(mBinding.clAddExpenseLayout,
+                        "Added expense of " + mBinding.etAddExpense.getText() + " to list",
+                        Snackbar.LENGTH_SHORT).show();
+                mBinding.etAddComment.getText().clear();
+                mBinding.etAddExpense.getText().clear();
+                UIUtil.hideKeyboard(Objects.requireNonNull(getActivity()));
             } catch (NumberFormatException ex) {
                 Snackbar.make(mBinding.clAddExpenseLayout, "Invalid date",
                         Snackbar.LENGTH_SHORT).show();
@@ -74,14 +79,7 @@ public class AddExpenseFragment extends Fragment {
         mViewModel.getErrorMessage().observe(this,
                 errorMessage -> Snackbar.make(mBinding.clAddExpenseLayout, errorMessage,
                         Snackbar.LENGTH_SHORT).show());
-        mViewModel.getOperationSuccessful().observe(this, successful -> {
-            if (successful) {
-                mBinding.etAddComment.getText().clear();
-                mBinding.etAddExpense.getText().clear();
-                Snackbar.make(mBinding.clAddExpenseLayout,
-                        "Added expense to list", Snackbar.LENGTH_SHORT).show();
-            }
-        });
+
 
     }
 

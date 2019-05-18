@@ -15,6 +15,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
 import com.sliebald.pairshare.R;
@@ -246,11 +247,21 @@ public class Repository {
     public void addExpense(Expense expense, ResultCallback callback) {
         expense.setUserID(mFbUser.getUid());
         Log.d(TAG, PreferenceUtils.getSelectedSharedExpenseListID());
-        mDb.collection(COLLECTION_KEY_EXPENSE_LISTS).document(PreferenceUtils.
-                getSelectedSharedExpenseListID()).collection(COLLECTION_KEY_EXPENSE).add(expense)
-                .addOnSuccessListener(documentReference -> callback.reportResult(0))
-                .addOnFailureListener(documentReference -> callback.reportResult(-1));
+        // TODO: transaction would be better, but only work when online. On small scale it should
+        //  be unlikely that something goes wrong here
+        // onSuccess/Failure/Complete listener also only works when online.
+        DocumentReference affectedListDocument =
+                mDb.collection(COLLECTION_KEY_EXPENSE_LISTS).document(PreferenceUtils.getSelectedSharedExpenseListID());
 
+        String userSharerInfo = "sharerInfo." + mFbUser.getUid();
+
+        affectedListDocument.collection(COLLECTION_KEY_EXPENSE).add(expense);
+//                .addOnSuccessListener(documentReference -> callback.reportResult(0))
+//                .addOnFailureListener(documentReference -> callback.reportResult(-1));
+        affectedListDocument.update(userSharerInfo + ".sumExpenses",
+                FieldValue.increment(expense.getAmount()));
+        affectedListDocument.update(userSharerInfo + ".numExpenses",
+                FieldValue.increment(1));
     }
 
     public interface ResultCallback {
