@@ -1,3 +1,6 @@
+// IMPORTAMT: Currently not used, was part of an earlier draft for how the app updates the sharerInfo for each list once a new expense is added.
+// This is now done locally on each client.
+/*
 const functions = require('firebase-functions');
 const admin = require('firebase-admin');
 admin.initializeApp();
@@ -67,3 +70,5 @@ exports.updateExpenseSharerInfo = functions.runWith({ memory: "128MB", timeoutSe
     });
 
   });
+*/
+
