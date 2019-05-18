@@ -57,6 +57,7 @@ public class Expense {
 
     /**
      * Set the id of the {@link User} that created the {@link Expense}.
+     *
      * @param userID firebase id of the {@link User}.
      */
     public void setUserID(String userID) {
@@ -66,6 +67,7 @@ public class Expense {
     /**
      * Get amount of the expense. Positive values mean the User spent money, negative the
      * {@link User} got money from another {@link User}.
+     *
      * @return Expense amount as double value.
      */
     public double getAmount() {
@@ -75,6 +77,7 @@ public class Expense {
     /**
      * Set amount of the expense. Positive values mean the User spent money, negative the
      * {@link User} got money from another {@link User}.
+     *
      * @param amount Expense amount as double value.
      */
     public void setAmount(double amount) {
@@ -83,6 +86,7 @@ public class Expense {
 
     /**
      * Get the optional comment describing the {@link Expense}.
+     *
      * @return Comment as String
      */
     public String getComment() {
@@ -91,6 +95,7 @@ public class Expense {
 
     /**
      * Get the optional comment describing the {@link Expense}.
+     *
      * @param comment Comment
      */
     public void setComment(String comment) {
@@ -99,6 +104,7 @@ public class Expense {
 
     /**
      * Get the {@link Date} the {@link Expense} took place
+     *
      * @return {@link Date} of the Expense.
      */
     public Date getTimeOfExpense() {
@@ -107,6 +113,7 @@ public class Expense {
 
     /**
      * Set the {@link Date} the {@link Expense} took place.
+     *
      * @param timeOfExpense {@link Date} of the Expense.
      */
     public void setTimeOfExpense(Date timeOfExpense) {

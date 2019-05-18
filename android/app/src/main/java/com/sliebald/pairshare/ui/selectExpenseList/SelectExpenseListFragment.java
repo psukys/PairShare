@@ -5,11 +5,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.firebase.ui.firestore.FirestoreRecyclerAdapter;
-import com.sliebald.pairshare.R;
-import com.sliebald.pairshare.data.Repository;
-import com.sliebald.pairshare.databinding.FragmentSelectExpenseListBinding;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.databinding.DataBindingUtil;
@@ -17,6 +12,11 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProviders;
 import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.LinearLayoutManager;
+
+import com.firebase.ui.firestore.FirestoreRecyclerAdapter;
+import com.sliebald.pairshare.R;
+import com.sliebald.pairshare.data.Repository;
+import com.sliebald.pairshare.databinding.FragmentSelectExpenseListBinding;
 
 public class SelectExpenseListFragment extends Fragment {
 

@@ -5,12 +5,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.google.android.material.snackbar.Snackbar;
-import com.sliebald.pairshare.R;
-import com.sliebald.pairshare.databinding.FragmentAddExpenseListBinding;
-
-import java.util.Objects;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.databinding.DataBindingUtil;
@@ -18,6 +12,12 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProviders;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
+
+import com.google.android.material.snackbar.Snackbar;
+import com.sliebald.pairshare.R;
+import com.sliebald.pairshare.databinding.FragmentAddExpenseListBinding;
+
+import java.util.Objects;
 
 public class AddExpenseListFragment extends Fragment {
 

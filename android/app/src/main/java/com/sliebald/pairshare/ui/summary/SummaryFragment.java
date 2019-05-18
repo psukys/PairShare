@@ -5,9 +5,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.sliebald.pairshare.R;
-
 import androidx.fragment.app.Fragment;
+
+import com.sliebald.pairshare.R;
 
 
 public class SummaryFragment extends Fragment {

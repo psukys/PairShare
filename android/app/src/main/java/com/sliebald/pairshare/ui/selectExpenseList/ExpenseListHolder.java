@@ -3,16 +3,16 @@ package com.sliebald.pairshare.ui.selectExpenseList;
 import android.view.View;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.cardview.widget.CardView;
+import androidx.recyclerview.widget.RecyclerView;
+
 import com.google.firebase.auth.FirebaseAuth;
 import com.sliebald.pairshare.MyApplication;
 import com.sliebald.pairshare.R;
 import com.sliebald.pairshare.data.models.ExpenseList;
 import com.sliebald.pairshare.utils.PreferenceUtils;
-
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.cardview.widget.CardView;
-import androidx.recyclerview.widget.RecyclerView;
 
 public class ExpenseListHolder extends RecyclerView.ViewHolder {
 

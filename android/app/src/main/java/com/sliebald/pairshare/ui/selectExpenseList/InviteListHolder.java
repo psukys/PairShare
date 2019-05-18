@@ -3,13 +3,13 @@ package com.sliebald.pairshare.ui.selectExpenseList;
 import android.view.View;
 import android.widget.TextView;
 
-import com.sliebald.pairshare.R;
-import com.sliebald.pairshare.data.models.ExpenseList;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.RecyclerView;
+
+import com.sliebald.pairshare.R;
+import com.sliebald.pairshare.data.models.ExpenseList;
 
 public class InviteListHolder extends RecyclerView.ViewHolder {
 

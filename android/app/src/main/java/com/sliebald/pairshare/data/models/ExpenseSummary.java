@@ -36,6 +36,7 @@ public class ExpenseSummary {
 
     /**
      * Get the number of {@link Expense}s of the corresponding {@link User} in the current list.
+     *
      * @return Number of {@link Expense}s
      */
     public int getNumExpenses() {
@@ -44,6 +45,7 @@ public class ExpenseSummary {
 
     /**
      * Set the number of {@link Expense}s of the corresponding {@link User} in the current list.
+     *
      * @param numExpenses Number of {@link Expense}s
      */
     public void setNumExpenses(int numExpenses) {
@@ -52,6 +54,7 @@ public class ExpenseSummary {
 
     /**
      * Get the sum of {@link Expense}s of the corresponding {@link User} in the current list.
+     *
      * @return Sum of {@link Expense}s
      */
     public double getSumExpenses() {
@@ -60,6 +63,7 @@ public class ExpenseSummary {
 
     /**
      * Set the sum of {@link Expense}s of the corresponding {@link User} in the current list.
+     *
      * @param sumExpenses Sum {@link Expense}s
      */
     public void setSumExpenses(double sumExpenses) {

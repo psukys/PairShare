@@ -32,6 +32,7 @@ public class User {
 
     /**
      * Get the mail address of the {@link User}.
+     *
      * @return mail address as String.
      */
     public String getMail() {
@@ -40,6 +41,7 @@ public class User {
 
     /**
      * Set the mail address of the {@link User}.
+     *
      * @param mail New mail address as String.
      */
     public void setMail(String mail) {
