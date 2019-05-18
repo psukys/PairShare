@@ -3,6 +3,7 @@ package com.sliebald.pairshare.data.models;
 import com.google.firebase.firestore.ServerTimestamp;
 
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -37,6 +38,12 @@ public class ExpenseList {
      * the ExpenseSummary for the according user.
      */
     private Map<String, ExpenseSummary> sharerInfo;
+
+    /**
+     * List of {@link User}s involved in this {@link ExpenseList}. Needed as firestore cannot
+     * check the sharerInfo map, where the keys contain the same info.
+     */
+    private List<String> sharers;
 
     /**
      * Name of the List
@@ -106,4 +113,23 @@ public class ExpenseList {
         this.listName = listName;
     }
 
+    /**
+     * Get the List of {@link User}s involved in this {@link ExpenseList}. Needed as firestore
+     * cannot check the sharerInfo map, where the keys contain the same info.
+     *
+     * @return List of Users involved in List.
+     */
+    public List<String> getSharers() {
+        return sharers;
+    }
+
+    /**
+     * Set the List of {@link User}s involved in this {@link ExpenseList}. Needed as firestore
+     * cannot check the sharerInfo map, where the keys contain the same info.
+     *
+     * @param sharers List of involved sharers.
+     */
+    public void setSharers(List<String> sharers) {
+        this.sharers = sharers;
+    }
 }

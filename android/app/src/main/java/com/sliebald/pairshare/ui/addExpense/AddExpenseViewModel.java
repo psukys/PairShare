@@ -67,9 +67,10 @@ class AddExpenseViewModel extends ViewModel implements Repository.ResultCallback
         expense.setComment(comment);
         expense.setAmount(amount);
         expense.setTimeOfExpense(Objects.requireNonNull(calendar.getValue()).getTime());
-        Repository.getInstance().addExpense(expense, this);
+        Repository.getInstance().addExpense(expense);
     }
 
+    //TODO: better solution needed.
     @Override
     public void reportResult(int resultCode) {
         if (resultCode == 0) {

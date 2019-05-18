@@ -10,17 +10,6 @@
             android:layout_height="match_parent"
             android:orientation="vertical">
 
-            <TextView
-                android:id="@+id/tv_title_invitedLists"
-                style="@style/title"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="@string/title_invited_lists" />
-
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/rv_InvitedLists"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
 
             <TextView
                 android:id="@+id/tv_title_activeLists"

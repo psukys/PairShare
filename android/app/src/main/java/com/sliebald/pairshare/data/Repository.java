@@ -24,7 +24,6 @@ import com.sliebald.pairshare.data.models.ExpenseList;
 import com.sliebald.pairshare.data.models.ExpenseSummary;
 import com.sliebald.pairshare.data.models.User;
 import com.sliebald.pairshare.ui.selectExpenseList.ExpenseListHolder;
-import com.sliebald.pairshare.ui.selectExpenseList.InviteListHolder;
 import com.sliebald.pairshare.utils.PreferenceUtils;
 
 import java.util.ArrayList;
@@ -32,10 +31,26 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Main Repository Class for Pairshare. Responsible for accessing firebase (especially firestore).
+ */
 public class Repository {
 
+    /**
+     * Firestore key for the expense_lists collection. Collection holds {@link ExpenseList}
+     * Documents.
+     */
     private static final String COLLECTION_KEY_EXPENSE_LISTS = "expense_lists";
+
+    /**
+     * Firestore key for the users collection. Collection holds {@link User} Documents.
+     */
     private static final String COLLECTION_KEY_USERS = "users";
+
+    /**
+     * Firestore key for the expense collections. Sub-collection of a {@link ExpenseList}
+     * Document in the expense_lists collection. Holds {@link Expense} Documents.
+     */
     private static final String COLLECTION_KEY_EXPENSE = "expenses";
 
     /**
@@ -44,12 +59,26 @@ public class Repository {
     private static final String TAG = Repository.class.getSimpleName();
     // Lock for Singleton instantiation
     private static final Object LOCK = new Object();
+
+    /**
+     * Singleton instance of the Repository.
+     */
     @SuppressLint("StaticFieldLeak")
     private static Repository sInstance;
+    /**
+     * {@link FirebaseUser} currently authenticated on the phone running pairshare.
+     */
     private FirebaseUser mFbUser;
+
+    /**
+     * {@link FirebaseFirestore} Firestore database access.
+     */
     private FirebaseFirestore mDb;
 
 
+    /**
+     * private constructor used by Singleton pattern.
+     */
     private Repository() {
         mFbUser = FirebaseAuth.getInstance().getCurrentUser();
         mDb = FirebaseFirestore.getInstance();
@@ -106,6 +135,9 @@ public class Repository {
 
     }
 
+    /**
+     * Testing/Debugging only.
+     */
     public void createTestExpenseOverview() {
 
         Expense expense = new Expense();
@@ -146,7 +178,7 @@ public class Repository {
             public void onBindViewHolder(@NonNull ExpenseListHolder holder, int position,
                                          @NonNull ExpenseList expenseList) {
                 holder.bind(expenseList, getSnapshots().getSnapshot(position).getId());
-                Log.d("1234", "" + expenseList);
+                Log.d(TAG, "" + expenseList);
             }
 
             @NonNull
@@ -161,45 +193,6 @@ public class Repository {
 
 
     /**
-     * Gets a {@link FirestoreRecyclerAdapter} that listens on invitations for {@link ExpenseList}
-     * s of the current user. The calling Fragment or activity has to manage the related
-     * lifecycle operations (adapter.startListening() in onStart() and adapter.stopListening in
-     * onStop)
-     *
-     * @return The {@link FirestoreRecyclerAdapter} to connect with a
-     * {@link androidx.recyclerview.widget.RecyclerView}.
-     */
-    public FirestoreRecyclerAdapter getPendingInvitationListsQuery() {
-
-        Query query = mDb.collection(COLLECTION_KEY_EXPENSE_LISTS)
-                .whereEqualTo(ExpenseList.KEY_INVITE, mFbUser.getUid())
-                .orderBy(ExpenseList.KEY_MODIFIED);
-
-        FirestoreRecyclerOptions<ExpenseList> options =
-                new FirestoreRecyclerOptions.Builder<ExpenseList>()
-                        .setQuery(query, ExpenseList.class)
-                        .build();
-
-        return new FirestoreRecyclerAdapter<ExpenseList,
-                InviteListHolder>(options) {
-            @Override
-            public void onBindViewHolder(@NonNull InviteListHolder holder, int position,
-                                         @NonNull ExpenseList expenseList) {
-                holder.bind(expenseList, getSnapshots().getSnapshot(position).getId());
-            }
-
-            @NonNull
-            @Override
-            public InviteListHolder onCreateViewHolder(@NonNull ViewGroup group, int i) {
-                View view = LayoutInflater.from(group.getContext())
-                        .inflate(R.layout.recycler_item_expense_list, group, false);
-                return new InviteListHolder(view);
-            }
-        };
-
-    }
-
-    /**
      * Create a new ExpenseList for the own user and the invited user based on his email.
      *
      * @param listName Name of the new {@link ExpenseList}.
@@ -208,28 +201,40 @@ public class Repository {
      *                 wasn't found.
      */
     public void createNewExpenseList(String listName, String invite, ResultCallback callback) {
-        ExpenseList expenseList = new ExpenseList();
-        expenseList.setListName(listName);
-        List<String> sharers = new ArrayList<>();
-        sharers.add(mFbUser.getUid());
-        expenseList.setSharers(sharers);
-        Map<String, ExpenseSummary> sharerInfo = new HashMap<>();
-        ExpenseSummary newSummary = new ExpenseSummary(0, 0.0, 0.0);
-        sharerInfo.put(mFbUser.getUid(), newSummary);
-        expenseList.setSharerInfo(sharerInfo);
+        //TODO: addOnCompleteListener only works when the phone is online. add a check and abort
+        // otherwise.
+        // Create a new ExpenseList.
 
+        //Get the other invited User.
+        Log.d(TAG, "adding expenselist: searching for user");
         mDb.collection(COLLECTION_KEY_USERS).whereEqualTo(User.KEY_MAIL,
                 invite.toLowerCase()).get().addOnCompleteListener(task -> {
-            if (task.isSuccessful() && task.getResult() != null && !task.getResult().getDocuments().isEmpty()) {
+            Log.d(TAG, "adding expenselist: found a user");
 
+            // if the invited user is found, get his id and add him to the sharerinfo too.
+            if (task.isSuccessful() && task.getResult() != null && !task.getResult().getDocuments().isEmpty()) {
                 DocumentSnapshot documentSnapshot = task.getResult().getDocuments().get(0);
+                Log.d(TAG, "adding expenselist: got user document");
+
                 if (!documentSnapshot.getId().equals(mFbUser.getUid())) {
-                    expenseList.setInvite(documentSnapshot.getId());
+                    ExpenseList expenseList = new ExpenseList();
+                    expenseList.setListName(listName);
+                    List<String> sharers = new ArrayList<>(2);
+                    sharers.add(mFbUser.getUid());
+                    sharers.add(documentSnapshot.getId());
+                    expenseList.setSharers(sharers);
+
+                    Map<String, ExpenseSummary> sharerInfo = new HashMap<>();
+                    sharerInfo.put(mFbUser.getUid(), new ExpenseSummary());
+                    sharerInfo.put(documentSnapshot.getId(), new ExpenseSummary());
+                    expenseList.setSharerInfo(sharerInfo);
+
+                    // Add the new expenslist to the collection and report success back.
+                    Log.d(TAG, "adding expenselist: adding list");
                     mDb.collection(COLLECTION_KEY_EXPENSE_LISTS).add(expenseList)
                             .addOnSuccessListener(documentReference -> callback.reportResult(0));
                 }
             } else {
-                //throw exception?
                 callback.reportResult(-1);
             }
         });
@@ -242,9 +247,8 @@ public class Repository {
      * in user to the logged expense.
      *
      * @param expense  The {@link Expense} to add.
-     * @param callback Called with resultcode 0 once successful, resultcode -1 in an error case.
      */
-    public void addExpense(Expense expense, ResultCallback callback) {
+    public void addExpense(Expense expense) {
         expense.setUserID(mFbUser.getUid());
         Log.d(TAG, PreferenceUtils.getSelectedSharedExpenseListID());
         // TODO: transaction would be better, but only work when online. On small scale it should
@@ -255,15 +259,19 @@ public class Repository {
 
         String userSharerInfo = "sharerInfo." + mFbUser.getUid();
 
+
         affectedListDocument.collection(COLLECTION_KEY_EXPENSE).add(expense);
-//                .addOnSuccessListener(documentReference -> callback.reportResult(0))
-//                .addOnFailureListener(documentReference -> callback.reportResult(-1));
+        //TODO: do this in one update if possible.
         affectedListDocument.update(userSharerInfo + ".sumExpenses",
                 FieldValue.increment(expense.getAmount()));
         affectedListDocument.update(userSharerInfo + ".numExpenses",
                 FieldValue.increment(1));
+
     }
 
+    /**
+     * Interface for reporting results back to the caller. -1= error, 0=success
+     */
     public interface ResultCallback {
         void reportResult(int resultCode);
     }

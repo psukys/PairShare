@@ -19,19 +19,8 @@ public class ExpenseSummary {
      * Default constructor for firebase.
      */
     public ExpenseSummary() {
-
-    }
-
-    /**
-     * Constructor.
-     *
-     * @param numExpenses Number of {@link Expense}s that the {@link User} added to the
-     *                    {@link ExpenseList}.
-     * @param sumExpenses Sum of {@link Expense}s a User had in an {@link ExpenseList}.
-     */
-    public ExpenseSummary(int numExpenses, double sumExpenses) {
-        this.numExpenses = numExpenses;
-        this.sumExpenses = sumExpenses;
+        numExpenses = 0;
+        sumExpenses = 0;
     }
 
     /**

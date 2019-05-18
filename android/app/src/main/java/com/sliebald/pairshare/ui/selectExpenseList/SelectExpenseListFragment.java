@@ -23,7 +23,6 @@ public class SelectExpenseListFragment extends Fragment {
     private SelectExpenseListViewModel mViewModel;
 
     private FirestoreRecyclerAdapter expenseListsAdapter;
-    private FirestoreRecyclerAdapter penndingInvitationListAdapter;
 
     /**
      * Databinding of the corresponding fragment layout.
@@ -45,12 +44,6 @@ public class SelectExpenseListFragment extends Fragment {
         super.onActivityCreated(savedInstanceState);
         mViewModel = ViewModelProviders.of(this).get(SelectExpenseListViewModel.class);
 
-
-        penndingInvitationListAdapter = Repository.getInstance().getPendingInvitationListsQuery();
-        mBinding.rvInvitedLists.setAdapter(penndingInvitationListAdapter);
-        mBinding.rvInvitedLists.setLayoutManager(new LinearLayoutManager(getContext()));
-
-
         expenseListsAdapter = Repository.getInstance().getExpenseListsAdapter();
 
         mBinding.rvActiveLists.setAdapter(expenseListsAdapter);
@@ -61,7 +54,6 @@ public class SelectExpenseListFragment extends Fragment {
     @Override
     public void onStart() {
         super.onStart();
-        penndingInvitationListAdapter.startListening();
         expenseListsAdapter.startListening();
 
     }
@@ -69,9 +61,7 @@ public class SelectExpenseListFragment extends Fragment {
     @Override
     public void onStop() {
         super.onStop();
-        penndingInvitationListAdapter.stopListening();
         expenseListsAdapter.stopListening();
-
     }
 
 
