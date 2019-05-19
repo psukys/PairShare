@@ -12,6 +12,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.sliebald.pairshare.MyApplication;
 import com.sliebald.pairshare.R;
 import com.sliebald.pairshare.data.models.ExpenseList;
+import com.sliebald.pairshare.utils.ExpenseListUtils;
 import com.sliebald.pairshare.utils.PreferenceUtils;
 
 public class ExpenseListHolder extends RecyclerView.ViewHolder {
@@ -38,8 +39,8 @@ public class ExpenseListHolder extends RecyclerView.ViewHolder {
         mCardView.setOnClickListener(view -> {
             PreferenceUtils.setSelectedSharedExpenseListID(mListID);
         });
-        PreferenceUtils.registerSelectedListChangedListener((sharedPreferences,
-                                                             key) -> {
+        PreferenceUtils.registerActiveListChangedListener((sharedPreferences,
+                                                           key) -> {
             if (key != null && key.equals(PreferenceUtils.PREFERENCE_KEY_SELECTED_EXPENSE)) {
                 String changedList =
                         sharedPreferences.getString(PreferenceUtils.PREFERENCE_KEY_SELECTED_EXPENSE, "");
@@ -71,26 +72,9 @@ public class ExpenseListHolder extends RecyclerView.ViewHolder {
     private void setBalance(ExpenseList expenseList) {
         String myId = FirebaseAuth.getInstance().getUid();
         //use int for rounding
-        int amount = 0;
-        for (String id : expenseList.getSharerInfo().keySet()) {
-            if (id.equals(myId)) amount += expenseList.getSharerInfo().get(id).getSumExpenses();
-            else amount -= expenseList.getSharerInfo().get(id).getSumExpenses();
-        }
-        if (amount >= 100)
-            mBalance.setTextColor(MyApplication.getContext()
-                    .getResources().getColor(R.color.balance_positive, null));
-        else if (amount > 0)
-            mBalance.setTextColor(MyApplication.getContext()
-                    .getResources().getColor(R.color.balance_slight_positive, null));
-
-        else if (amount < 0 && amount > -100)
-            mBalance.setTextColor(MyApplication.getContext()
-                    .getResources().getColor(R.color.balance_slight_negative, null));
-        else if (amount <= -100)
-            mBalance.setTextColor(MyApplication.getContext()
-                    .getResources().getColor(R.color.balance_negative, null));
-
-        mBalance.setText(String.format("%d", amount));
+        double difference = ExpenseListUtils.getExpenseDifferenceFor(myId, expenseList);
+        mBalance.setTextColor(ExpenseListUtils.getExpenseDifferenceColor(difference));
+        mBalance.setText(String.format("%.2f€", difference));
 
     }
 

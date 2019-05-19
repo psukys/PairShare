@@ -33,7 +33,7 @@ public class PreferenceUtils {
 
     }
 
-    public static void registerSelectedListChangedListener(SharedPreferences.OnSharedPreferenceChangeListener listener) {
+    public static void registerActiveListChangedListener(SharedPreferences.OnSharedPreferenceChangeListener listener) {
         PreferenceManager.getDefaultSharedPreferences(MyApplication.getContext()).registerOnSharedPreferenceChangeListener(listener);
     }
 

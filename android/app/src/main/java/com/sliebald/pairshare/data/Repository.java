@@ -1,12 +1,15 @@
 package com.sliebald.pairshare.data;
 
 import android.annotation.SuppressLint;
+import android.content.SharedPreferences;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
+import androidx.lifecycle.LiveData;
+import androidx.lifecycle.MutableLiveData;
 
 import com.firebase.ui.firestore.FirestoreRecyclerAdapter;
 import com.firebase.ui.firestore.FirestoreRecyclerOptions;
@@ -74,6 +77,11 @@ public class Repository {
      * {@link FirebaseFirestore} Firestore database access.
      */
     private FirebaseFirestore mDb;
+
+    /**
+     * Livedata for the currently selected ExpenseList.
+     */
+    private MutableLiveData<ExpenseList> activeExpenseList;
 
 
     /**
@@ -274,6 +282,59 @@ public class Repository {
      */
     public interface ResultCallback {
         void reportResult(int resultCode);
+    }
+
+    /**
+     * {@link android.content.SharedPreferences.OnSharedPreferenceChangeListener} for updating
+     * the livedata if another list was selected. Cannot be a global variable, as it might get
+     * garbage collected in that case.
+     */
+    private SharedPreferences.OnSharedPreferenceChangeListener onPrefChangeListener;
+
+    public LiveData<ExpenseList> getActiveExpenseList() {
+
+        if (activeExpenseList == null) {
+            activeExpenseList = new MutableLiveData<>();
+            onPrefChangeListener = (sharedPreferences, key) -> {
+                updateActiveExpenseList();
+            };
+            PreferenceUtils.registerActiveListChangedListener(onPrefChangeListener);
+            Log.d(TAG, "Added activeListChangedListener");
+        }
+        updateActiveExpenseList();
+        return activeExpenseList;
+    }
+
+    private void updateActiveExpenseList() {
+        Log.d(TAG, "Active List changed, updating Livedata.");
+
+
+        mDb.collection(COLLECTION_KEY_EXPENSE_LISTS)
+                .document(PreferenceUtils.getSelectedSharedExpenseListID())
+                .addSnapshotListener((snapshot, e) -> {
+                    if (e != null) {
+                        Log.w(TAG, "Listen failed.", e);
+                        return;
+                    }
+
+                    if (snapshot != null && snapshot.exists()) {
+                        ExpenseList list = snapshot.toObject(ExpenseList.class);
+                        activeExpenseList.postValue(list);
+                    }
+                });
+
+//        mDb.collection(COLLECTION_KEY_EXPENSE_LISTS).document(PreferenceUtils.getSelectedSharedExpenseListID())
+//
+//
+//
+//                .get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+//            @Override
+//            public void onSuccess(DocumentSnapshot documentSnapshot) {
+//                ExpenseList list = documentSnapshot.toObject(ExpenseList.class);
+//                activeExpenseList.postValue(list);
+//            }
+//        });
+
     }
 
 

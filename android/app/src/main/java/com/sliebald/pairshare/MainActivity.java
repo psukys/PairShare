@@ -2,6 +2,9 @@ package com.sliebald.pairshare;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.Spannable;
+import android.text.SpannableString;
+import android.text.style.ForegroundColorSpan;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -9,6 +12,7 @@ import android.view.View;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.databinding.DataBindingUtil;
+import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
@@ -20,7 +24,9 @@ import com.firebase.ui.auth.IdpResponse;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.sliebald.pairshare.data.models.ExpenseList;
 import com.sliebald.pairshare.databinding.ActivityMainBinding;
+import com.sliebald.pairshare.utils.ExpenseListUtils;
 import com.sliebald.pairshare.utils.KeyboardUtils;
 
 import net.yslibrary.android.keyboardvisibilityevent.KeyboardVisibilityEvent;
@@ -83,6 +89,27 @@ public class MainActivity extends AppCompatActivity {
         mAppBarConfiguration = new AppBarConfiguration.Builder(tlds).build();
         setupActionBar(mNavController);
         setupBottomNavMenu(mNavController);
+
+        mViewModel.getActiveExpenseList().observe(this, new Observer<ExpenseList>() {
+            @Override
+            public void onChanged(ExpenseList expenseList) {
+
+                double expenseDiff =
+                        ExpenseListUtils.getExpenseDifferenceFor(mFirebaseAuth.getUid(),
+                                expenseList);
+
+                String title = expenseList.getListName() + ": ";
+                String completeSummaryString = title + expenseDiff + "€";
+
+                Spannable spannable = new SpannableString(completeSummaryString);
+
+                spannable.setSpan(new ForegroundColorSpan(ExpenseListUtils.getExpenseDifferenceColor(expenseDiff)), title.length(),
+                        completeSummaryString.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+
+                mBinding.toolbar.setSubtitle(spannable);
+//                mBinding.toolbar.setSubtitle(expenseList.getListName() + " " + expenseDiff + "€");
+            }
+        });
     }
 
 
@@ -162,13 +189,11 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.action_logout:
-                AuthUI.getInstance().signOut(this);
-                return true;
-            default:
-                return super.onOptionsItemSelected(item);
+        if (item.getItemId() == R.id.action_logout) {
+            AuthUI.getInstance().signOut(this);
+            return true;
         }
+        return super.onOptionsItemSelected(item);
     }
 
     @Override
