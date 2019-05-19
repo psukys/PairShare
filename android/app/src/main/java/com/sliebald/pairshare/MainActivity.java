@@ -8,6 +8,7 @@ import android.view.View;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.databinding.DataBindingUtil;
 import androidx.lifecycle.ViewModelProviders;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
@@ -19,6 +20,8 @@ import com.firebase.ui.auth.IdpResponse;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.sliebald.pairshare.databinding.ActivityMainBinding;
+import com.sliebald.pairshare.utils.KeyboardUtils;
 
 import net.yslibrary.android.keyboardvisibilityevent.KeyboardVisibilityEvent;
 
@@ -43,11 +46,15 @@ public class MainActivity extends AppCompatActivity {
     private FirebaseAuth.AuthStateListener authStateListener;
 
     private MainActivityViewModel mViewModel;
+    private ActivityMainBinding mBinding;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        mBinding = DataBindingUtil.setContentView(this, R.layout.activity_main);
+
+        // setContentView(R.layout.activity_main);
         mViewModel = ViewModelProviders.of(this).get(MainActivityViewModel.class);
 
         //Log user in if he isn't already logged in.
@@ -142,6 +149,7 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public boolean onSupportNavigateUp() {
+        KeyboardUtils.hideKeyboard(this, mBinding.getRoot());
         return NavigationUI.navigateUp(mNavController, mAppBarConfiguration);
     }
 

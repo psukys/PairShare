@@ -16,6 +16,7 @@ import androidx.navigation.Navigation;
 import com.google.android.material.snackbar.Snackbar;
 import com.sliebald.pairshare.R;
 import com.sliebald.pairshare.databinding.FragmentAddExpenseListBinding;
+import com.sliebald.pairshare.utils.KeyboardUtils;
 
 import java.util.Objects;
 
@@ -57,6 +58,7 @@ public class AddExpenseListFragment extends Fragment {
             if (successful) {
                 Snackbar.make(Objects.requireNonNull(getActivity()).findViewById(R.id.main_layout),
                         "Added new List", Snackbar.LENGTH_SHORT).show();
+                KeyboardUtils.hideKeyboard(getContext(), getView());
                 navController.navigateUp();
             }
         });
