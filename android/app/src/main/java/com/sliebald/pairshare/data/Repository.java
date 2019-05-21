@@ -21,6 +21,7 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
+import com.google.firebase.firestore.WriteBatch;
 import com.sliebald.pairshare.R;
 import com.sliebald.pairshare.data.models.Expense;
 import com.sliebald.pairshare.data.models.ExpenseList;
@@ -266,22 +267,16 @@ public class Repository {
                 mDb.collection(COLLECTION_KEY_EXPENSE_LISTS).document(PreferenceUtils.getSelectedSharedExpenseListID());
 
         String userSharerInfo = "sharerInfo." + mFbUser.getUid();
+        DocumentReference expenseDocument =
+                affectedListDocument.collection(COLLECTION_KEY_EXPENSE).document();
 
-
-        affectedListDocument.collection(COLLECTION_KEY_EXPENSE).add(expense);
-        //TODO: do this in one update if possible.
-        affectedListDocument.update(userSharerInfo + ".sumExpenses",
-                FieldValue.increment(expense.getAmount()));
-        affectedListDocument.update(userSharerInfo + ".numExpenses",
+        // add the new expense and update the counters in the parent list as batch operation
+        WriteBatch batch = mDb.batch();
+        batch.set(expenseDocument, expense);
+        batch.update(affectedListDocument, userSharerInfo + ".sumExpenses",
+                FieldValue.increment(expense.getAmount()), userSharerInfo + ".numExpenses",
                 FieldValue.increment(1));
-
-    }
-
-    /**
-     * Interface for reporting results back to the caller. -1= error, 0=success
-     */
-    public interface ResultCallback {
-        void reportResult(int resultCode);
+        batch.commit();
     }
 
     /**
@@ -306,9 +301,7 @@ public class Repository {
     }
 
     private void updateActiveExpenseList() {
-        Log.d(TAG, "Active List changed, updating Livedata.");
-
-
+        Log.d(TAG, "Active List changed, updating LiveData.");
         mDb.collection(COLLECTION_KEY_EXPENSE_LISTS)
                 .document(PreferenceUtils.getSelectedSharedExpenseListID())
                 .addSnapshotListener((snapshot, e) -> {
@@ -322,20 +315,13 @@ public class Repository {
                         activeExpenseList.postValue(list);
                     }
                 });
-
-//        mDb.collection(COLLECTION_KEY_EXPENSE_LISTS).document(PreferenceUtils.getSelectedSharedExpenseListID())
-//
-//
-//
-//                .get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
-//            @Override
-//            public void onSuccess(DocumentSnapshot documentSnapshot) {
-//                ExpenseList list = documentSnapshot.toObject(ExpenseList.class);
-//                activeExpenseList.postValue(list);
-//            }
-//        });
-
     }
 
+    /**
+     * Interface for reporting results back to the caller. -1= error, 0=success
+     */
+    public interface ResultCallback {
+        void reportResult(int resultCode);
+    }
 
 }
