@@ -8,6 +8,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
+import androidx.lifecycle.LifecycleOwner;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
@@ -116,12 +117,10 @@ public class Repository {
      * @param callback The listener called on success of the db request.
      */
     public void getCurrentUser(OnCompleteListener<DocumentSnapshot> callback) {
-
         if (mFbUser == null)
             return;
         DocumentReference docRef = mDb.collection("users").document(mFbUser.getUid());
         docRef.get().addOnCompleteListener(callback);
-
     }
 
     /**
@@ -167,10 +166,12 @@ public class Repository {
      * current user. The calling Fragment or activity has to manage the related lifecycle
      * operations (adapter.startListening() in onStart() and adapter.stopListening in onStop)
      *
+     * @param owner The owner of the lifecycle using the adapter. For automatic lifecylce
+     *              management (no need to start/stop listening)
      * @return The {@link FirestoreRecyclerAdapter} to connect with a
      * {@link androidx.recyclerview.widget.RecyclerView}.
      */
-    public FirestoreRecyclerAdapter getExpenseListsAdapter() {
+    public FirestoreRecyclerAdapter getExpenseListsAdapter(LifecycleOwner owner) {
 
         Query query = mDb.collection(COLLECTION_KEY_EXPENSE_LISTS)
                 .whereArrayContains(ExpenseList.KEY_SHARERS, mFbUser.getUid())
@@ -179,6 +180,7 @@ public class Repository {
         FirestoreRecyclerOptions<ExpenseList> options =
                 new FirestoreRecyclerOptions.Builder<ExpenseList>()
                         .setQuery(query, ExpenseList.class)
+                        .setLifecycleOwner(owner)
                         .build();
 
         return new FirestoreRecyclerAdapter<ExpenseList,

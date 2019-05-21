@@ -44,25 +44,11 @@ public class SelectExpenseListFragment extends Fragment {
         super.onActivityCreated(savedInstanceState);
         mViewModel = ViewModelProviders.of(this).get(SelectExpenseListViewModel.class);
 
-        expenseListsAdapter = Repository.getInstance().getExpenseListsAdapter();
+        expenseListsAdapter = Repository.getInstance().getExpenseListsAdapter(this);
 
         mBinding.rvActiveLists.setAdapter(expenseListsAdapter);
         mBinding.rvActiveLists.setLayoutManager(new LinearLayoutManager(getContext()));
 
     }
-
-    @Override
-    public void onStart() {
-        super.onStart();
-        expenseListsAdapter.startListening();
-
-    }
-
-    @Override
-    public void onStop() {
-        super.onStop();
-        expenseListsAdapter.stopListening();
-    }
-
 
 }
