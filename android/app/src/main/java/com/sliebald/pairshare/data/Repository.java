@@ -211,8 +211,7 @@ public class Repository {
      */
     public void createNewExpenseList(String listName, String invite, ResultCallback callback) {
         //TODO: addOnCompleteListener only works when the phone is online. add a check and abort
-        // otherwise.
-        // Create a new ExpenseList.
+        // otherwise. Create a new ExpenseList.
 
         //Get the other invited User.
         Log.d(TAG, "adding expenselist: searching for user");
