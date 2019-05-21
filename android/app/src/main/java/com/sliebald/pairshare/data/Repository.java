@@ -3,17 +3,11 @@ package com.sliebald.pairshare.data;
 import android.annotation.SuppressLint;
 import android.content.SharedPreferences;
 import android.util.Log;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
 
-import androidx.annotation.NonNull;
-import androidx.lifecycle.LifecycleOwner;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
 import com.firebase.ui.firestore.FirestoreRecyclerAdapter;
-import com.firebase.ui.firestore.FirestoreRecyclerOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -23,12 +17,10 @@ import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.WriteBatch;
-import com.sliebald.pairshare.R;
 import com.sliebald.pairshare.data.models.Expense;
 import com.sliebald.pairshare.data.models.ExpenseList;
 import com.sliebald.pairshare.data.models.ExpenseSummary;
 import com.sliebald.pairshare.data.models.User;
-import com.sliebald.pairshare.ui.selectExpenseList.ExpenseListHolder;
 import com.sliebald.pairshare.utils.PreferenceUtils;
 
 import java.util.ArrayList;
@@ -162,44 +154,16 @@ public class Repository {
     }
 
     /**
-     * Gets a {@link FirestoreRecyclerAdapter} that listens on active {@link ExpenseList}s of the
-     * current user. The calling Fragment or activity has to manage the related lifecycle
-     * operations (adapter.startListening() in onStart() and adapter.stopListening in onStop)
-     *
-     * @param owner The owner of the lifecycle using the adapter. For automatic lifecylce
-     *              management (no need to start/stop listening)
-     * @return The {@link FirestoreRecyclerAdapter} to connect with a
+     * Gets a {@link Query} for the expenseLists of the user. Can be used as input to create a
+     * {@link FirestoreRecyclerAdapter} for displaying the data in a
      * {@link androidx.recyclerview.widget.RecyclerView}.
+     *
+     * @return The {@link Query} object
      */
-    public FirestoreRecyclerAdapter getExpenseListsAdapter(LifecycleOwner owner) {
-
-        Query query = mDb.collection(COLLECTION_KEY_EXPENSE_LISTS)
+    public Query getExpenseListsAdapter() {
+        return mDb.collection(COLLECTION_KEY_EXPENSE_LISTS)
                 .whereArrayContains(ExpenseList.KEY_SHARERS, mFbUser.getUid())
                 .orderBy(ExpenseList.KEY_MODIFIED);
-
-        FirestoreRecyclerOptions<ExpenseList> options =
-                new FirestoreRecyclerOptions.Builder<ExpenseList>()
-                        .setQuery(query, ExpenseList.class)
-                        .setLifecycleOwner(owner)
-                        .build();
-
-        return new FirestoreRecyclerAdapter<ExpenseList,
-                ExpenseListHolder>(options) {
-            @Override
-            public void onBindViewHolder(@NonNull ExpenseListHolder holder, int position,
-                                         @NonNull ExpenseList expenseList) {
-                holder.bind(expenseList, getSnapshots().getSnapshot(position).getId());
-                Log.d(TAG, "" + expenseList);
-            }
-
-            @NonNull
-            @Override
-            public ExpenseListHolder onCreateViewHolder(@NonNull ViewGroup group, int i) {
-                View view = LayoutInflater.from(group.getContext())
-                        .inflate(R.layout.recycler_item_expense_list, group, false);
-                return new ExpenseListHolder(view);
-            }
-        };
     }
 
 
