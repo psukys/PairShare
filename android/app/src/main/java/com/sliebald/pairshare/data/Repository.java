@@ -188,7 +188,7 @@ public class Repository {
         return mDb.collection(COLLECTION_KEY_EXPENSE_LISTS)
                 .document(PreferenceUtils.getSelectedSharedExpenseListID())
                 .collection(COLLECTION_KEY_EXPENSE)
-                .orderBy(Expense.KEY_CREATED, Query.Direction.ASCENDING);
+                .orderBy(Expense.KEY_CREATED, Query.Direction.DESCENDING);
     }
 
 

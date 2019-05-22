@@ -26,7 +26,7 @@ public class Expense {
      */
     private String userID;
 
-       /**
+    /**
      * Firebase name of the {@link User} creating the Expense at the time of creation.
      */
     private String userName;
@@ -143,7 +143,8 @@ public class Expense {
 
     /**
      * Set the name of the user creating the Expense at the time of creation
-      * @param userName name of the user
+     *
+     * @param userName name of the user
      */
     public void setUserName(String userName) {
         this.userName = userName;

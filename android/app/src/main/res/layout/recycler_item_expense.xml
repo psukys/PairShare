@@ -21,7 +21,7 @@
             android:layout_height="wrap_content">
 
             <TextView
-                android:id="@+id/tv_label_date"
+                android:id="@+id/tv_label_date_name"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:minWidth="40dp"
@@ -40,7 +40,7 @@
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toStartOf="@id/tv_label_amount"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/tv_label_date"
+                app:layout_constraintTop_toBottomOf="@id/tv_label_date_name"
                 tools:text="Some User" />
 
             <TextView

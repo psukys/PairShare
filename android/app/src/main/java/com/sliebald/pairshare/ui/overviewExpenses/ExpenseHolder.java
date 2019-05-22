@@ -37,7 +37,7 @@ public class ExpenseHolder extends RecyclerView.ViewHolder {
         super(itemView);
         mComment = itemView.findViewById(R.id.tv_label_comment);
         mExpenseAmount = itemView.findViewById(R.id.tv_label_amount);
-        mExpenseDate = itemView.findViewById(R.id.tv_label_date);
+        mExpenseDate = itemView.findViewById(R.id.tv_label_date_name);
         mCardView = itemView.findViewById(R.id.cv_expense_item);
 
     }
@@ -52,19 +52,20 @@ public class ExpenseHolder extends RecyclerView.ViewHolder {
             mCardView.setCardBackgroundColor(MyApplication.getContext()
                     .getResources().getColor(R.color.balance_slight_positive, null));
             params.setMarginEnd(15);
-            params.setMarginStart(80);
+            params.setMarginStart(120);
 
         } else {
             mCardView.setCardBackgroundColor(MyApplication.getContext()
                     .getResources().getColor(R.color.balance_slight_negative, null));
             params.setMarginStart(15);
-            params.setMarginEnd(80);
+            params.setMarginEnd(120);
         }
         mCardView.requestLayout();
         mComment.setText(expense.getComment());
-        DateFormat dateFormat = new SimpleDateFormat("yyyy-mm-dd hh:mm", Locale.GERMAN);
+        DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm", Locale.GERMAN);
 
-        mExpenseDate.setText(dateFormat.format(expense.getTimeOfExpense()));
+        mExpenseDate.setText(String.format("%s - %s",
+                dateFormat.format(expense.getTimeOfExpense()), expense.getUserName()));
         mExpenseAmount.setText(String.format(Locale.GERMAN, "%.2f€", expense.getAmount()));
     }
 
