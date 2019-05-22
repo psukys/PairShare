@@ -44,15 +44,13 @@ public class ExpenseHolder extends RecyclerView.ViewHolder {
                 (ViewGroup.MarginLayoutParams) mCardView.getLayoutParams();
         if (Expense.getUserID().equals(myId)) {
             mCardView.setCardBackgroundColor(MyApplication.getContext()
-                    .getResources().getColor(R.color.colorPrimaryLight, null));
-//            params.setMargins(40, 10, 10, 10);
+                    .getResources().getColor(R.color.balance_slight_positive, null));
             params.setMarginEnd(15);
             params.setMarginStart(80);
 
         } else {
             mCardView.setCardBackgroundColor(MyApplication.getContext()
-                    .getResources().getColor(R.color.balance_negative, null));
-//            params.setMargins(10, 10, 80, 10);
+                    .getResources().getColor(R.color.balance_slight_negative, null));
             params.setMarginStart(15);
             params.setMarginEnd(80);
         }
