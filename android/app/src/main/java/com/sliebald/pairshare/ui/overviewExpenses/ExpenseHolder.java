@@ -31,7 +31,7 @@ public class ExpenseHolder extends RecyclerView.ViewHolder {
     /**
      * Create the {@link ExpenseHolder} for an Expense.
      *
-     * @param itemView
+     * @param itemView The layout view the item should be bound to.
      */
     public ExpenseHolder(@NonNull View itemView) {
         super(itemView);
@@ -42,6 +42,11 @@ public class ExpenseHolder extends RecyclerView.ViewHolder {
 
     }
 
+    /**
+     * Binds the relevant fields of the {@link Expense} to the layout views.
+     *
+     * @param expense The {@link Expense} to bind.
+     */
     public void bind(@NonNull Expense expense) {
 
         String myId = FirebaseAuth.getInstance().getUid();
