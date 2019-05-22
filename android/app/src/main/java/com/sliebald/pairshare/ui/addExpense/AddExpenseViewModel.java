@@ -10,29 +10,24 @@ import com.sliebald.pairshare.data.models.Expense;
 import java.util.Calendar;
 import java.util.Objects;
 
-class AddExpenseViewModel extends ViewModel implements Repository.ResultCallback {
+/**
+ * Viewmodel for the {@link AddExpenseFragment}. Handling interaction with the {@link Repository}
+ * and implements other logic
+ */
+class AddExpenseViewModel extends ViewModel {
     private static final String TAG = AddExpenseViewModel.class.getSimpleName();
 
+    /**
+     * Calender used for selecting the current time. exposed as {@link LiveData}.
+     */
     private MutableLiveData<Calendar> calendar;
 
-    private MutableLiveData<String> errorMessage;
-    private MutableLiveData<Boolean> operationSuccessful;
 
-
-    LiveData<String> getErrorMessage() {
-        if (errorMessage == null) {
-            errorMessage = new MutableLiveData<>();
-        }
-        return errorMessage;
-    }
-
-    LiveData<Boolean> getOperationSuccessful() {
-        if (operationSuccessful == null) {
-            operationSuccessful = new MutableLiveData<>();
-        }
-        return operationSuccessful;
-    }
-
+    /**
+     * Getter for the Calender used for selecting current time.
+     *
+     * @return The current calender as livedata
+     */
     LiveData<Calendar> getCalendar() {
         if (calendar == null) {
             calendar = new MutableLiveData<>();
@@ -61,23 +56,16 @@ class AddExpenseViewModel extends ViewModel implements Repository.ResultCallback
      *
      * @param amount  Amount of money spent.
      * @param comment Comment for the expense (e.g. reason).
+     * @param username Current username.
      */
-    void addExpense(Double amount, String comment) {
+    void addExpense(Double amount, String comment, String username) {
         Expense expense = new Expense();
         expense.setComment(comment);
         expense.setAmount(amount);
+        expense.setUserName(username);
         expense.setTimeOfExpense(Objects.requireNonNull(calendar.getValue()).getTime());
         Repository.getInstance().addExpense(expense);
     }
 
-    //TODO: better solution needed.
-    @Override
-    public void reportResult(int resultCode) {
-        if (resultCode == 0) {
-            operationSuccessful.postValue(true);
-        } else if (resultCode == -1) {
-            errorMessage.postValue("Could not add expense to list, try again later.");
-        }
-    }
 
 }

@@ -10,10 +10,13 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
 
 import com.google.android.material.snackbar.Snackbar;
+import com.sliebald.pairshare.MainActivityViewModel;
 import com.sliebald.pairshare.R;
+import com.sliebald.pairshare.data.models.User;
 import com.sliebald.pairshare.databinding.FragmentAddExpenseBinding;
 
 import net.yslibrary.android.keyboardvisibilityevent.util.UIUtil;
@@ -33,6 +36,7 @@ public class AddExpenseFragment extends Fragment {
      * {@link androidx.lifecycle.ViewModel} of this fragment.
      */
     private AddExpenseViewModel mViewModel;
+    private MainActivityViewModel mViewModelMain;
 
     /**
      * Databinding of the corresponding fragment layout.
@@ -53,6 +57,8 @@ public class AddExpenseFragment extends Fragment {
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         mViewModel = ViewModelProviders.of(this).get(AddExpenseViewModel.class);
+        mViewModelMain = ViewModelProviders.of(this).get(MainActivityViewModel.class);
+
         setupTimePicker();
         mViewModel.getCalendar().observe(this, this::setDate);
         mBinding.button.setOnClickListener(v -> {
@@ -64,21 +70,27 @@ public class AddExpenseFragment extends Fragment {
             }
             try {
                 Double amount = Double.valueOf(mBinding.etAddExpense.getText().toString());
-                mViewModel.addExpense(amount, mBinding.etAddComment.getText().toString());
-                Snackbar.make(mBinding.clAddExpenseLayout,
-                        "Added expense of " + mBinding.etAddExpense.getText() + " to list",
-                        Snackbar.LENGTH_SHORT).show();
-                mBinding.etAddComment.getText().clear();
-                mBinding.etAddExpense.getText().clear();
-                UIUtil.hideKeyboard(Objects.requireNonNull(getActivity()));
+                mViewModelMain.getUser().observe(this, new Observer<User>() {
+                    @Override
+                    public void onChanged(User user) {
+                        mViewModelMain.getUser().removeObserver(this);
+                        mViewModel.addExpense(amount, mBinding.etAddComment.getText().toString(),
+                                user.getUsername());
+                        Snackbar.make(mBinding.clAddExpenseLayout,
+                                "Added expense of " + mBinding.etAddExpense.getText() + " to list",
+                                Snackbar.LENGTH_SHORT).show();
+                        mBinding.etAddComment.getText().clear();
+                        mBinding.etAddExpense.getText().clear();
+                        UIUtil.hideKeyboard(Objects.requireNonNull(getActivity()));
+
+                    }
+                });
+
             } catch (NumberFormatException ex) {
                 Snackbar.make(mBinding.clAddExpenseLayout, "Invalid date",
                         Snackbar.LENGTH_SHORT).show();
             }
         });
-        mViewModel.getErrorMessage().observe(this,
-                errorMessage -> Snackbar.make(mBinding.clAddExpenseLayout, errorMessage,
-                        Snackbar.LENGTH_SHORT).show());
 
 
     }

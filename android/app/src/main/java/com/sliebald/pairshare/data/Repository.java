@@ -7,7 +7,6 @@ import android.util.Log;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
-import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentReference;
@@ -102,17 +101,19 @@ public class Repository {
     }
 
     /**
-     * Gets the currently logged in user and returns the result using the given
-     * {@link OnCompleteListener}
+     * Gets the currently logged in {@link User} and returns the result as {@link LiveData}.
      *
-     * @param callback The listener called on success of the db request.
      */
-    public void getCurrentUser(OnCompleteListener<DocumentSnapshot> callback) {
-        if (mFbUser == null)
-            return;
-        DocumentReference docRef = mDb.collection("users").document(mFbUser.getUid());
-        docRef.get().addOnCompleteListener(callback);
+    public LiveData<User> getCurrentUser() {
+
+        MutableLiveData<User> user = new MutableLiveData<>();
+        mDb.collection(COLLECTION_KEY_USERS)
+                .document(mFbUser.getUid())
+                .get()
+                .addOnSuccessListener(documentSnapshot -> user.postValue(documentSnapshot.toObject(User.class)));
+        return user;
     }
+
 
     /**
      * Creates a new entry for the currently logged in User in Firestore.
@@ -121,6 +122,10 @@ public class Repository {
     public void checkNewUser() {
         User user = new User();
         user.setMail(mFbUser.getEmail());
+        if (mFbUser.getDisplayName() != null && !mFbUser.getDisplayName().isEmpty())
+            user.setUsername(mFbUser.getDisplayName());
+        else
+            user.setUsername(mFbUser.getEmail());
         String id = mFbUser.getUid();
 
         mDb.collection(COLLECTION_KEY_USERS).document(id).get().addOnCompleteListener(task -> {
@@ -245,9 +250,6 @@ public class Repository {
     public void addExpense(Expense expense) {
         expense.setUserID(mFbUser.getUid());
         Log.d(TAG, PreferenceUtils.getSelectedSharedExpenseListID());
-        // TODO: transaction would be better, but only work when online. On small scale it should
-        //  be unlikely that something goes wrong here
-        // onSuccess/Failure/Complete listener also only works when online.
         DocumentReference affectedListDocument =
                 mDb.collection(COLLECTION_KEY_EXPENSE_LISTS)
                         .document(PreferenceUtils.getSelectedSharedExpenseListID());
@@ -257,6 +259,8 @@ public class Repository {
                 affectedListDocument.collection(COLLECTION_KEY_EXPENSE).document();
 
         // add the new expense and update the counters in the parent list as batch operation
+        // Using increment operation avoids inconsistencies in case of multiple users adding
+        // expenses at the same time.
         WriteBatch batch = mDb.batch();
         batch.set(expenseDocument, expense);
         batch.update(affectedListDocument, userSharerInfo + ".sumExpenses",
@@ -272,6 +276,11 @@ public class Repository {
      */
     private SharedPreferences.OnSharedPreferenceChangeListener onPrefChangeListener;
 
+    /**
+     * Get the {@link ExpenseList} that is currently selected from firestore,
+     *
+     * @return The {@link ExpenseList} as {@link LiveData}.
+     */
     public LiveData<ExpenseList> getActiveExpenseList() {
 
         if (activeExpenseList == null) {
@@ -286,8 +295,13 @@ public class Repository {
         return activeExpenseList;
     }
 
+    /**
+     * Helpermethod to update the {@link LiveData} {@link ExpenseList} object if the user changes
+     * the active list.
+     */
     private void updateActiveExpenseList() {
         Log.d(TAG, "Active List changed, updating LiveData.");
+        //TODO: cleanup old snapshotlisteners required?
         mDb.collection(COLLECTION_KEY_EXPENSE_LISTS)
                 .document(PreferenceUtils.getSelectedSharedExpenseListID())
                 .addSnapshotListener((snapshot, e) -> {

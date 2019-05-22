@@ -26,6 +26,11 @@ public class Expense {
      */
     private String userID;
 
+       /**
+     * Firebase name of the {@link User} creating the Expense at the time of creation.
+     */
+    private String userName;
+
     /**
      * Amount of the expense. Positive values mean the User spent money, negative the {@link User} got
      * money from another {@link User}.
@@ -41,6 +46,7 @@ public class Expense {
      * Date the {@link Expense} was made.
      */
     private Date timeOfExpense;
+
 
     /**
      * Get when the expense was created.
@@ -124,5 +130,22 @@ public class Expense {
      */
     public void setTimeOfExpense(Date timeOfExpense) {
         this.timeOfExpense = timeOfExpense;
+    }
+
+    /**
+     * Get the name of the {@link User} creating the Expense at the time of creation.
+     *
+     * @return name as String
+     */
+    public String getUserName() {
+        return userName;
+    }
+
+    /**
+     * Set the name of the user creating the Expense at the time of creation
+      * @param userName name of the user
+     */
+    public void setUserName(String userName) {
+        this.userName = userName;
     }
 }

@@ -19,6 +19,11 @@ public class User {
     private String mail;
 
     /**
+     * Username of the {@link User}.
+     */
+    private String username;
+
+    /**
      * Time the {@link User} was created.
      */
     @ServerTimestamp
@@ -48,4 +53,21 @@ public class User {
         this.mail = mail.toLowerCase();
     }
 
+    /**
+     * Get the Username of the {@link User}
+     *
+     * @return username as String.
+     */
+    public String getUsername() {
+        return username;
+    }
+
+    /**
+     * Set the username of the {@link User}
+     *
+     * @param username username as String.
+     */
+    public void setUsername(String username) {
+        this.username = username;
+    }
 }
