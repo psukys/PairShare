@@ -55,5 +55,8 @@ dependencies {
     // https://github.com/firebase/FirebaseUI-Android
     implementation 'com.firebaseui:firebase-ui-auth:4.3.2'
     implementation 'com.firebaseui:firebase-ui-firestore:4.3.2'
+
+    implementation 'android.arch.paging:runtime:1.0.1'
+
 }
 apply plugin: 'com.google.gms.google-services'

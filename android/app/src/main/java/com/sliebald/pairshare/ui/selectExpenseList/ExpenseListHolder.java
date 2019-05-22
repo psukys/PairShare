@@ -15,6 +15,8 @@ import com.sliebald.pairshare.data.models.ExpenseList;
 import com.sliebald.pairshare.utils.ExpenseListUtils;
 import com.sliebald.pairshare.utils.PreferenceUtils;
 
+import java.util.Locale;
+
 public class ExpenseListHolder extends RecyclerView.ViewHolder {
 
 
@@ -74,7 +76,7 @@ public class ExpenseListHolder extends RecyclerView.ViewHolder {
         //use int for rounding
         double difference = ExpenseListUtils.getExpenseDifferenceFor(myId, expenseList);
         mBalance.setTextColor(ExpenseListUtils.getExpenseDifferenceColor(difference));
-        mBalance.setText(String.format("%.2f€", difference));
+        mBalance.setText(String.format(Locale.GERMAN, "%.2f€", difference));
 
     }
 

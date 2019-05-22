@@ -83,7 +83,7 @@ public class MainActivity extends AppCompatActivity {
         mNavController = Navigation.findNavController(this, R.id.my_nav_host_fragment);
         Set<Integer> tlds = new HashSet<>();
         tlds.add(R.id.addExpense_dest);
-        tlds.add(R.id.selectExpense_dest);
+        tlds.add(R.id.selectExpenseList_dest);
 
 
         mAppBarConfiguration = new AppBarConfiguration.Builder(tlds).build();

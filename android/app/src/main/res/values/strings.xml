@@ -21,5 +21,7 @@
     <string name="label_add_expense_list">Create new list</string>
     <string name="title_invited_lists">Invited Lists</string>
     <string name="title_add_a_new">Add new Expense:</string>
+    <string name="title_last_expenses">Last Expenses:</string>
+    <string name="nav_expenses">Expenses</string>
 
 </resources>

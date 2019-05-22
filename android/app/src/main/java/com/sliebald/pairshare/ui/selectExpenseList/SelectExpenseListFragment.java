@@ -10,7 +10,6 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
-import androidx.lifecycle.ViewModelProviders;
 import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
@@ -33,10 +32,8 @@ public class SelectExpenseListFragment extends Fragment {
     private static final String TAG = SelectExpenseListFragment.class.getSimpleName();
 
     /**
-     * Todo: make use of viewModel?
+     * Adapter for displaying available expenseLists.
      */
-    private SelectExpenseListViewModel mViewModel;
-
     private FirestoreRecyclerAdapter expenseListsAdapter;
 
     /**
@@ -57,9 +54,8 @@ public class SelectExpenseListFragment extends Fragment {
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        mViewModel = ViewModelProviders.of(this).get(SelectExpenseListViewModel.class);
 
-        Query query = Repository.getInstance().getExpenseListsAdapter();
+        Query query = Repository.getInstance().getExpenseListsQuery();
 
 
         FirestoreRecyclerOptions<ExpenseList> options =

@@ -10,6 +10,12 @@ import java.util.Date;
 public class Expense {
 
     /**
+     * Key for accessing the created value of the Expense in firestore.
+     */
+    public static final String KEY_CREATED = "created";
+
+
+    /**
      * Time the {@link Expense} was created.
      */
     @ServerTimestamp

@@ -7,7 +7,6 @@ import android.util.Log;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
-import com.firebase.ui.firestore.FirestoreRecyclerAdapter;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -144,26 +143,47 @@ public class Repository {
         expense.setUserID(mFbUser.getUid());
         expense.setAmount(50.1);
         expense.setComment("This is a test expense");
-        mDb.collection(COLLECTION_KEY_EXPENSE_LISTS).document("test").collection(COLLECTION_KEY_EXPENSE).add(expense);
+        mDb.collection(COLLECTION_KEY_EXPENSE_LISTS)
+                .document("test")
+                .collection(COLLECTION_KEY_EXPENSE)
+                .add(expense);
         expense.setUserID(mFbUser.getUid());
         expense.setAmount(150.1);
         expense.setComment("This is a second test expense");
 
-        mDb.collection(COLLECTION_KEY_EXPENSE_LISTS).document("test").collection(COLLECTION_KEY_EXPENSE).add(expense);
+        mDb.collection(COLLECTION_KEY_EXPENSE_LISTS)
+                .document("test")
+                .collection(COLLECTION_KEY_EXPENSE)
+                .add(expense);
 
     }
 
     /**
      * Gets a {@link Query} for the expenseLists of the user. Can be used as input to create a
-     * {@link FirestoreRecyclerAdapter} for displaying the data in a
+     * {@link com.firebase.ui.firestore.FirestoreRecyclerAdapter} for displaying the data in a
      * {@link androidx.recyclerview.widget.RecyclerView}.
      *
      * @return The {@link Query} object
      */
-    public Query getExpenseListsAdapter() {
+    public Query getExpenseListsQuery() {
         return mDb.collection(COLLECTION_KEY_EXPENSE_LISTS)
                 .whereArrayContains(ExpenseList.KEY_SHARERS, mFbUser.getUid())
                 .orderBy(ExpenseList.KEY_MODIFIED);
+    }
+
+    /**
+     * Gets a {@link Query} for the expenses of currently selected list. Can be used as input to
+     * create a {@link com.firebase.ui.firestore.FirestoreRecyclerAdapter} or
+     * {@link com.firebase.ui.firestore.paging.FirestorePagingAdapter} for displaying the data in a
+     * {@link androidx.recyclerview.widget.RecyclerView}.
+     *
+     * @return The {@link Query} object
+     */
+    public Query getExpensesForActiveListQuery() {
+        return mDb.collection(COLLECTION_KEY_EXPENSE_LISTS)
+                .document(PreferenceUtils.getSelectedSharedExpenseListID())
+                .collection(COLLECTION_KEY_EXPENSE)
+                .orderBy(Expense.KEY_CREATED, Query.Direction.ASCENDING);
     }
 
 
@@ -229,7 +249,8 @@ public class Repository {
         //  be unlikely that something goes wrong here
         // onSuccess/Failure/Complete listener also only works when online.
         DocumentReference affectedListDocument =
-                mDb.collection(COLLECTION_KEY_EXPENSE_LISTS).document(PreferenceUtils.getSelectedSharedExpenseListID());
+                mDb.collection(COLLECTION_KEY_EXPENSE_LISTS)
+                        .document(PreferenceUtils.getSelectedSharedExpenseListID());
 
         String userSharerInfo = "sharerInfo." + mFbUser.getUid();
         DocumentReference expenseDocument =

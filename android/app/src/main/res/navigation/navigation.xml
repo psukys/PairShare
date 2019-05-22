@@ -10,16 +10,9 @@
         android:name="com.sliebald.pairshare.ui.addExpense.AddExpenseFragment"
         android:label="@string/label_add_entry"
         tools:layout="@layout/fragment_add_expense">
-        <action
-            android:id="@+id/action_addEntryFragment_to_selectExpenseFragment"
-            app:destination="@id/selectExpense_dest"
-            app:enterAnim="@anim/slide_in_right"
-            app:exitAnim="@anim/slide_out_left"
-            app:popEnterAnim="@anim/slide_in_left"
-            app:popExitAnim="@anim/slide_out_right" />
     </fragment>
     <fragment
-        android:id="@+id/selectExpense_dest"
+        android:id="@+id/selectExpenseList_dest"
         android:name="com.sliebald.pairshare.ui.selectExpenseList.SelectExpenseListFragment"
         android:label="@string/label_select_list"
         tools:layout="@layout/fragment_select_expense_list">
@@ -30,12 +23,17 @@
             app:exitAnim="@anim/slide_out_left"
             app:popEnterAnim="@anim/slide_in_left"
             app:popExitAnim="@anim/slide_out_right"
-            app:popUpTo="@+id/selectExpense_dest" />
+            app:popUpTo="@+id/selectExpenseList_dest" />
     </fragment>
     <fragment
         android:id="@+id/addExpenseList_dest"
         android:name="com.sliebald.pairshare.ui.addExpenseList.AddExpenseListFragment"
         android:label="@string/label_add_expense_list"
         tools:layout="@layout/fragment_add_expense_list" />
+    <fragment
+        android:id="@+id/overviewExpenses_dest"
+        android:name="com.sliebald.pairshare.ui.overviewExpenses.OverviewExpenseFragment"
+        android:label="fragment_overview_expense"
+        tools:layout="@layout/fragment_overview_expense" />
 
 </navigation>
