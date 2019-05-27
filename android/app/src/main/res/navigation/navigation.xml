@@ -33,7 +33,7 @@
     <fragment
         android:id="@+id/overviewExpenses_dest"
         android:name="com.sliebald.pairshare.ui.overviewExpenses.OverviewExpenseFragment"
-        android:label="fragment_overview_expense"
+        android:label="@string/label_last_expenses"
         tools:layout="@layout/fragment_overview_expense" />
 
 </navigation>

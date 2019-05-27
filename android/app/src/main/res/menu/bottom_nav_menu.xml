@@ -8,7 +8,7 @@
 
     <item
         android:id="@+id/overviewExpenses_dest"
-        android:icon="@drawable/ic_dashboard_black_24dp"
+        android:icon="@drawable/ic_list_black_24dp"
         android:title="@string/nav_expenses" />
     <item
         android:id="@+id/selectExpenseList_dest"

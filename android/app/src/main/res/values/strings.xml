@@ -23,5 +23,6 @@
     <string name="title_add_a_new">Add new Expense:</string>
     <string name="title_last_expenses">Last Expenses:</string>
     <string name="nav_expenses">Expenses</string>
+    <string name="label_last_expenses">Last Expenses</string>
 
 </resources>

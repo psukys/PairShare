@@ -45,12 +45,12 @@ exports.sendExpenseNotification = functions.runWith({ memory: "128MB", timeoutSe
     // Collect the tokens of all users that should be notified
     const tokens = [];
     for (const usr of users){
-      console.log("users"+usr.data() + " "+ usr.data().mail);
+      //console.log("Will notify user" + usr.data().mail);
       if(usr.data().fcmToken){
       tokens.push(usr.data().fcmToken);}
       
     }
-    console.log("tokens "+tokens);
+    //console.log("tokens "+tokens);
   
     // Send out notifications
     if(tokens.length>0)
