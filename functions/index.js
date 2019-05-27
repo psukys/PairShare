@@ -20,13 +20,7 @@ exports.sendExpenseNotification = functions.runWith({ memory: "128MB", timeoutSe
     const listName = expenseList.data().listName;
     const user = await db.collection('users').doc(userId).get();
 
-    const sharers = expenseList.data().sharers;
-    // const users= await db.collection('users').get();
-    //console.log("users: " + Array.isArray(users)); 
-
     const userName = user.data().username;
-    const fcmToken = user.data().fcmToken;
-    const tokens = [];
     const text =  `Added ${amount}€ to List "${listName}": ${comment}`
 
     const payload = {
@@ -38,30 +32,35 @@ exports.sendExpenseNotification = functions.runWith({ memory: "128MB", timeoutSe
       }
     };
 
-
-    // TODO: exclude own id? 
+    // Get all sharers involved in the list the expense was added to
+    const sharers = expenseList.data().sharers;
     const results = [];
+    // Get all involved user documents except the user that triggered the event.
     for (const usr of sharers) {
-      results.push(db.collection('users').doc(usr).get());
+      if(usr!==userId) 
+        results.push(db.collection('users').doc(usr).get());
     }
     const users= await Promise.all(results);
    
-
+    // Collect the tokens of all users that should be notified
+    const tokens = [];
     for (const usr of users){
       console.log("users"+usr.data() + " "+ usr.data().mail);
       if(usr.data().fcmToken){
       tokens.push(usr.data().fcmToken);}
       
     }
-   console.log("tokens "+tokens);
+    console.log("tokens "+tokens);
   
-    await admin.messaging().sendToDevice(tokens, payload);
+    // Send out notifications
+    if(tokens.length>0)
+      await admin.messaging().sendToDevice(tokens, payload);
    
   });
 
 
-// IMPORTANT: Functions below Currently not used, was part of an earlier draft for how the app updates the sharerInfo for each list once a new expense is added.
-// This is now done locally on each client.
+// IMPORTANT: Function below currently not used, was part of an earlier draft for how the app updates the sharerInfo for each list once a new expense is added.
+// This is now done locally on each client using the new increment property to update the parent list.
 
 /*
 // updates the Info/summary of expenses for a list whenever a new expense is added
