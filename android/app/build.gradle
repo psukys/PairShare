@@ -55,8 +55,12 @@ dependencies {
     // https://github.com/firebase/FirebaseUI-Android
     implementation 'com.firebaseui:firebase-ui-auth:4.3.2'
     implementation 'com.firebaseui:firebase-ui-firestore:4.3.2'
-
+    // Paging required for the firebase-ui-firestore paging adapter
     implementation 'android.arch.paging:runtime:1.0.1'
+
+    // Firebase cloud messaging for sending updates on new expenses.
+    implementation 'com.google.firebase:firebase-messaging:18.0.0'
+
 
 }
 apply plugin: 'com.google.gms.google-services'

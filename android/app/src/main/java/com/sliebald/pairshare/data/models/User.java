@@ -24,6 +24,12 @@ public class User {
     private String username;
 
     /**
+     * FCM Token used for cloud notifications on events.
+     */
+    private String fcmToken;
+
+
+    /**
      * Time the {@link User} was created.
      */
     @ServerTimestamp
@@ -70,4 +76,59 @@ public class User {
     public void setUsername(String username) {
         this.username = username;
     }
+
+    /**
+     * Get the FCM Token used for cloud notifications on events.
+     *
+     * @return Token as String.
+     */
+    public String getFcmToken() {
+        return fcmToken;
+    }
+
+    /**
+     * Set the FCM Token used for cloud notifications on events.
+     *
+     * @param fcmToken as String.
+     */
+    public void setFcmToken(String fcmToken) {
+        this.fcmToken = fcmToken;
+    }
+
+    /**
+     * Getter for user created.
+     *
+     * @return creation date of the {@link User}.
+     */
+    public Date getCreated() {
+        return created;
+    }
+
+    /**
+     * Setter for user created.
+     *
+     * @param created {@link Date} when the {@link User} was created.
+     */
+    public void setCreated(Date created) {
+        this.created = created;
+    }
+
+    /**
+     * Getter for {@link User} modified
+     *
+     * @return Date when the {@link User} was last modified
+     */
+    public Date getModified() {
+        return modified;
+    }
+
+    /**
+     * Setter for user modified.
+     *
+     * @param modified when was the user modified.
+     */
+    public void setModified(Date modified) {
+        this.modified = modified;
+    }
+
 }

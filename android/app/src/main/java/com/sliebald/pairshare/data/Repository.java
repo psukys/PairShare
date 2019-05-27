@@ -15,6 +15,7 @@ import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.WriteBatch;
+import com.google.firebase.iid.FirebaseInstanceId;
 import com.sliebald.pairshare.data.models.Expense;
 import com.sliebald.pairshare.data.models.ExpenseList;
 import com.sliebald.pairshare.data.models.ExpenseSummary;
@@ -22,6 +23,7 @@ import com.sliebald.pairshare.data.models.User;
 import com.sliebald.pairshare.utils.PreferenceUtils;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -60,10 +62,6 @@ public class Repository {
      */
     @SuppressLint("StaticFieldLeak")
     private static Repository sInstance;
-    /**
-     * {@link FirebaseUser} currently authenticated on the phone running pairshare.
-     */
-    private FirebaseUser mFbUser;
 
     /**
      * {@link FirebaseFirestore} Firestore database access.
@@ -80,8 +78,16 @@ public class Repository {
      * private constructor used by Singleton pattern.
      */
     private Repository() {
-        mFbUser = FirebaseAuth.getInstance().getCurrentUser();
         mDb = FirebaseFirestore.getInstance();
+    }
+
+    /**
+     * Get the currently logged in firebase user.
+     *
+     * @return FirebaseUser
+     */
+    private FirebaseUser getFirebaseUser() {
+        return FirebaseAuth.getInstance().getCurrentUser();
     }
 
     /**
@@ -108,7 +114,7 @@ public class Repository {
 
         MutableLiveData<User> user = new MutableLiveData<>();
         mDb.collection(COLLECTION_KEY_USERS)
-                .document(mFbUser.getUid())
+                .document(getFirebaseUser().getUid())
                 .get()
                 .addOnSuccessListener(documentSnapshot -> user.postValue(documentSnapshot.toObject(User.class)));
         return user;
@@ -120,39 +126,62 @@ public class Repository {
      * If the user already exists, nothing is changed.
      */
     public void checkNewUser() {
+        FirebaseUser fbUser = getFirebaseUser();
         User user = new User();
-        user.setMail(mFbUser.getEmail());
-        if (mFbUser.getDisplayName() != null && !mFbUser.getDisplayName().isEmpty())
-            user.setUsername(mFbUser.getDisplayName());
+        user.setMail(fbUser.getEmail());
+        if (fbUser.getDisplayName() != null && !fbUser.getDisplayName().isEmpty())
+            user.setUsername(fbUser.getDisplayName());
         else
-            user.setUsername(mFbUser.getEmail());
-        String id = mFbUser.getUid();
+            user.setUsername(fbUser.getEmail());
+        String id = fbUser.getUid();
 
-        mDb.collection(COLLECTION_KEY_USERS).document(id).get().addOnCompleteListener(task -> {
-            if (task.isSuccessful()) {
-                DocumentSnapshot document = task.getResult();
-                if (document != null && !document.exists()) {
-                    mDb.collection(COLLECTION_KEY_USERS).document(id).set(user);
-                }
-            }
-        });
+        //Get the firebase cloud messaging token, then add the user or update him.
+        //TODO: Token should be monitored in case it changes:
+        // https://firebase.google.com/docs/cloud-messaging/android/first-message
+        // #access_the_registration_token
+        FirebaseInstanceId.getInstance().getInstanceId()
+                .addOnSuccessListener(instanceIdResult -> {
+                    String token = instanceIdResult.getToken();
+                    user.setFcmToken(token);
+                    mDb.collection(COLLECTION_KEY_USERS).document(id).get().addOnCompleteListener(task -> {
+                        if (task.isSuccessful()) {
+                            DocumentSnapshot document = task.getResult();
+                            if (document != null && !document.exists()) {
+                                mDb.collection(COLLECTION_KEY_USERS).document(id).set(user);
+                            } else if (document != null) {
+                                // If user already exists, update him if token differs.
+                                User userUpdate = document.toObject(User.class);
+                                if (userUpdate != null && (userUpdate.getFcmToken() == null
+                                        || !userUpdate.getFcmToken().equals(token))) {
+                                    userUpdate.setFcmToken(token);
+                                    userUpdate.setModified(Calendar.getInstance().getTime());
+                                    mDb.collection(COLLECTION_KEY_USERS).document(id).set(userUpdate);
+                                }
+                            }
+                        }
+                    });
+
+                });
+
 
     }
+
 
     /**
      * Testing/Debugging only.
      */
     public void createTestExpenseOverview() {
+        String uid = getFirebaseUser().getUid();
 
         Expense expense = new Expense();
-        expense.setUserID(mFbUser.getUid());
+        expense.setUserID(uid);
         expense.setAmount(50.1);
         expense.setComment("This is a test expense");
         mDb.collection(COLLECTION_KEY_EXPENSE_LISTS)
                 .document("test")
                 .collection(COLLECTION_KEY_EXPENSE)
                 .add(expense);
-        expense.setUserID(mFbUser.getUid());
+        expense.setUserID(uid);
         expense.setAmount(150.1);
         expense.setComment("This is a second test expense");
 
@@ -172,7 +201,7 @@ public class Repository {
      */
     public Query getExpenseListsQuery() {
         return mDb.collection(COLLECTION_KEY_EXPENSE_LISTS)
-                .whereArrayContains(ExpenseList.KEY_SHARERS, mFbUser.getUid())
+                .whereArrayContains(ExpenseList.KEY_SHARERS, getFirebaseUser().getUid())
                 .orderBy(ExpenseList.KEY_MODIFIED);
     }
 
@@ -214,17 +243,18 @@ public class Repository {
             if (task.isSuccessful() && task.getResult() != null && !task.getResult().getDocuments().isEmpty()) {
                 DocumentSnapshot documentSnapshot = task.getResult().getDocuments().get(0);
                 Log.d(TAG, "adding expenselist: got user document");
+                FirebaseUser fbUser = getFirebaseUser();
 
-                if (!documentSnapshot.getId().equals(mFbUser.getUid())) {
+                if (!documentSnapshot.getId().equals(fbUser.getUid())) {
                     ExpenseList expenseList = new ExpenseList();
                     expenseList.setListName(listName);
                     List<String> sharers = new ArrayList<>(2);
-                    sharers.add(mFbUser.getUid());
+                    sharers.add(fbUser.getUid());
                     sharers.add(documentSnapshot.getId());
                     expenseList.setSharers(sharers);
 
                     Map<String, ExpenseSummary> sharerInfo = new HashMap<>();
-                    sharerInfo.put(mFbUser.getUid(), new ExpenseSummary());
+                    sharerInfo.put(fbUser.getUid(), new ExpenseSummary());
                     sharerInfo.put(documentSnapshot.getId(), new ExpenseSummary());
                     expenseList.setSharerInfo(sharerInfo);
 
@@ -248,13 +278,14 @@ public class Repository {
      * @param expense  The {@link Expense} to add.
      */
     public void addExpense(Expense expense) {
-        expense.setUserID(mFbUser.getUid());
+        FirebaseUser fbUser = getFirebaseUser();
+        expense.setUserID(fbUser.getUid());
         Log.d(TAG, PreferenceUtils.getSelectedSharedExpenseListID());
         DocumentReference affectedListDocument =
                 mDb.collection(COLLECTION_KEY_EXPENSE_LISTS)
                         .document(PreferenceUtils.getSelectedSharedExpenseListID());
 
-        String userSharerInfo = "sharerInfo." + mFbUser.getUid();
+        String userSharerInfo = "sharerInfo." + fbUser.getUid();
         DocumentReference expenseDocument =
                 affectedListDocument.collection(COLLECTION_KEY_EXPENSE).document();
 

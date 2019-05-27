@@ -1,12 +1,69 @@
-// IMPORTAMT: Currently not used, was part of an earlier draft for how the app updates the sharerInfo for each list once a new expense is added.
-// This is now done locally on each client.
-/*
 const functions = require('firebase-functions');
 const admin = require('firebase-admin');
 admin.initializeApp();
 
 const db = admin.firestore();
 
+
+// Sends a notifications to all users when a new message is posted.
+exports.sendExpenseNotification = functions.runWith({ memory: "128MB", timeoutSeconds: 30 })
+  .firestore.document('expense_lists/{listId}/expenses/{expenseId}')
+  .onCreate(async (snapshot,context) =>{
+    // Added amount.
+    const amount = snapshot.data().amount;
+    const comment = snapshot.data().comment;
+    // User adding the expense.
+    const userId = snapshot.data().userID;
+    // The reference to the list the expense was added to.
+
+    const expenseList = await db.collection('expense_lists').doc(context.params.listId).get();
+    const listName = expenseList.data().listName;
+    const user = await db.collection('users').doc(userId).get();
+
+    const sharers = expenseList.data().sharers;
+    // const users= await db.collection('users').get();
+    //console.log("users: " + Array.isArray(users)); 
+
+    const userName = user.data().username;
+    const fcmToken = user.data().fcmToken;
+    const tokens = [];
+    const text =  `Added ${amount}€ to List "${listName}": ${comment}`
+
+    const payload = {
+      notification: {
+        title: `${userName} added an Expense`,
+        body: text ? (text.length <= 100 ? text : text.substring(0, 97) + '...') : '',
+//            icon: snapshot.data().profilePicUrl || '/images/profile_placeholder.png',
+//            click_action: `https://${process.env.GCLOUD_PROJECT}.firebaseapp.com`,
+      }
+    };
+
+
+    // TODO: exclude own id? 
+    const results = [];
+    for (const usr of sharers) {
+      results.push(db.collection('users').doc(usr).get());
+    }
+    const users= await Promise.all(results);
+   
+
+    for (const usr of users){
+      console.log("users"+usr.data() + " "+ usr.data().mail);
+      if(usr.data().fcmToken){
+      tokens.push(usr.data().fcmToken);}
+      
+    }
+   console.log("tokens "+tokens);
+  
+    await admin.messaging().sendToDevice(tokens, payload);
+   
+  });
+
+
+// IMPORTANT: Functions below Currently not used, was part of an earlier draft for how the app updates the sharerInfo for each list once a new expense is added.
+// This is now done locally on each client.
+
+/*
 // updates the Info/summary of expenses for a list whenever a new expense is added
 exports.updateExpenseSharerInfo = functions.runWith({ memory: "128MB", timeoutSeconds: 30 }).firestore
   .document('expense_lists/{listId}/expenses/{expenseId}')
@@ -71,4 +128,3 @@ exports.updateExpenseSharerInfo = functions.runWith({ memory: "128MB", timeoutSe
 
   });
 */
-
