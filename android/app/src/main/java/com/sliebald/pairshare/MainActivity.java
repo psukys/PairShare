@@ -34,6 +34,7 @@ import net.yslibrary.android.keyboardvisibilityevent.KeyboardVisibilityEvent;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Objects;
 import java.util.Set;
 
@@ -100,7 +101,7 @@ public class MainActivity extends AppCompatActivity {
                                 expenseList);
 
                 String title = expenseList.getListName() + ": ";
-                String completeSummaryString = title + expenseDiff + "€";
+                String completeSummaryString = title + String.format(Locale.GERMAN, "%.2f€", expenseDiff);
 
                 Spannable spannable = new SpannableString(completeSummaryString);
 
@@ -108,7 +109,6 @@ public class MainActivity extends AppCompatActivity {
                         completeSummaryString.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
 
                 mBinding.toolbar.setSubtitle(spannable);
-//                mBinding.toolbar.setSubtitle(expenseList.getListName() + " " + expenseDiff + "€");
             }
         });
     }

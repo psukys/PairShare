@@ -333,19 +333,20 @@ public class Repository {
     private void updateActiveExpenseList() {
         Log.d(TAG, "Active List changed, updating LiveData.");
         //TODO: cleanup old snapshotlisteners required?
-        mDb.collection(COLLECTION_KEY_EXPENSE_LISTS)
-                .document(PreferenceUtils.getSelectedSharedExpenseListID())
-                .addSnapshotListener((snapshot, e) -> {
-                    if (e != null) {
-                        Log.w(TAG, "Listen failed.", e);
-                        return;
-                    }
+        if (PreferenceUtils.getSelectedSharedExpenseListID() != null)
+            mDb.collection(COLLECTION_KEY_EXPENSE_LISTS)
+                    .document(PreferenceUtils.getSelectedSharedExpenseListID())
+                    .addSnapshotListener((snapshot, e) -> {
+                        if (e != null) {
+                            Log.w(TAG, "Listen failed.", e);
+                            return;
+                        }
 
-                    if (snapshot != null && snapshot.exists()) {
-                        ExpenseList list = snapshot.toObject(ExpenseList.class);
-                        activeExpenseList.postValue(list);
-                    }
-                });
+                        if (snapshot != null && snapshot.exists()) {
+                            ExpenseList list = snapshot.toObject(ExpenseList.class);
+                            activeExpenseList.postValue(list);
+                        }
+                    });
     }
 
     /**
