@@ -107,6 +107,7 @@ public class AddExpenseFragment extends Fragment {
                                 Snackbar.LENGTH_SHORT).show();
                         mBinding.etAddComment.getText().clear();
                         mBinding.etAddExpense.getText().clear();
+                        mBinding.ibAddImage.setImageResource(android.R.color.transparent);
                         UIUtil.hideKeyboard(Objects.requireNonNull(getActivity()));
 
                     }
@@ -218,12 +219,8 @@ public class AddExpenseFragment extends Fragment {
                 Bitmap imageBitmap = MediaStore.Images.Media.getBitmap(getContext().getContentResolver(),
                         Uri.fromFile(new File(mViewModel.getLatestImagePath())));
                 mViewModel.setImage(imageBitmap);
+                mBinding.ibAddImage.setImageBitmap(mViewModel.getImage());
 
-                // optional: retrieve a thumbnail
-                Bundle extras = data.getExtras();
-                if (extras == null) return;
-                Bitmap tumbnailBitmap = (Bitmap) extras.get("data");
-                mViewModel.setThumbnail(tumbnailBitmap);
             } catch (IOException e) {
                 e.printStackTrace();
             }

@@ -47,6 +47,16 @@ public class Expense {
      */
     private Date timeOfExpense;
 
+    /**
+     * Path of the image in firebase storage.
+     */
+    private String imagePath;
+
+    /**
+     * Path of the tumbnail in firebase storage.
+     */
+    private String thumbnailPath;
+
 
     /**
      * Get when the expense was created.
@@ -149,4 +159,41 @@ public class Expense {
     public void setUserName(String userName) {
         this.userName = userName;
     }
+
+    /**
+     * Get the path of the image in firebase storage.
+     *
+     * @return Path as String.
+     */
+    public String getImagePath() {
+        return imagePath;
+    }
+
+    /**
+     * Set the path of the image in firebase storage.
+     *
+     * @param imagePath path as String
+     */
+    public void setImagePath(String imagePath) {
+        this.imagePath = imagePath;
+    }
+
+    /**
+     * Get the path of the thumbnail in firebase storage.
+     *
+     * @return Path as String.
+     */
+    public String getThumbnailPath() {
+        return thumbnailPath;
+    }
+
+    /**
+     * Set the path of the thumbnail in firebase storage.
+     *
+     * @param thumbnailPath path as String
+     */
+    public void setThumbnailPath(String thumbnailPath) {
+        this.thumbnailPath = thumbnailPath;
+    }
+
 }

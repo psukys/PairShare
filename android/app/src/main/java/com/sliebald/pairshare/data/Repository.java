@@ -2,6 +2,7 @@ package com.sliebald.pairshare.data;
 
 import android.annotation.SuppressLint;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
 import android.util.Log;
 
 import androidx.lifecycle.LiveData;
@@ -16,17 +17,21 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.WriteBatch;
 import com.google.firebase.iid.FirebaseInstanceId;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
 import com.sliebald.pairshare.data.models.Expense;
 import com.sliebald.pairshare.data.models.ExpenseList;
 import com.sliebald.pairshare.data.models.ExpenseSummary;
 import com.sliebald.pairshare.data.models.User;
 import com.sliebald.pairshare.utils.PreferenceUtils;
 
+import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 /**
  * Main Repository Class for Pairshare. Responsible for accessing firebase (especially firestore).
@@ -271,21 +276,43 @@ public class Repository {
 
     }
 
+    private String uploadImage(Bitmap image, String path) {
+        FirebaseStorage storage = FirebaseStorage.getInstance();
+        StorageReference storageRef = storage.getReference();
+
+        StorageReference imageRef =
+                storageRef.child(path);
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        image.compress(Bitmap.CompressFormat.JPEG, 100, baos);
+        imageRef.putBytes(baos.toByteArray())
+                .addOnFailureListener(e -> Log.d(TAG,
+                        "Error on image upload: " + e.getMessage()))
+                .addOnSuccessListener(taskSnapshot -> Log.d(TAG, "Upload Success"));
+        return imageRef.getPath();
+    }
+
     /**
      * Adds the given expense to the currently selected List. Adds the ID of the currently logged
      * in user to the logged expense.
      *
      * @param expense  The {@link Expense} to add.
+     * @param image The image to add to the expense
+     * @param thumbnail The thumbnail to add to the expense.
      */
-    public void addExpense(Expense expense) {
+    public void addExpense(Expense expense, Bitmap image, Bitmap thumbnail) {
         FirebaseUser fbUser = getFirebaseUser();
         expense.setUserID(fbUser.getUid());
-        Log.d(TAG, PreferenceUtils.getSelectedSharedExpenseListID());
+
+        if (image != null && thumbnail != null) {
+            expense.setImagePath(uploadImage(image, "images/" + UUID.randomUUID().toString() + ".jpeg"));
+            expense.setThumbnailPath(uploadImage(thumbnail, "thumbnails/" + UUID.randomUUID().toString() +
+                    ".jpeg"));
+        }
+
+        String userSharerInfo = "sharerInfo." + fbUser.getUid();
         DocumentReference affectedListDocument =
                 mDb.collection(COLLECTION_KEY_EXPENSE_LISTS)
                         .document(PreferenceUtils.getSelectedSharedExpenseListID());
-
-        String userSharerInfo = "sharerInfo." + fbUser.getUid();
         DocumentReference expenseDocument =
                 affectedListDocument.collection(COLLECTION_KEY_EXPENSE).document();
 
@@ -298,6 +325,16 @@ public class Repository {
                 FieldValue.increment(expense.getAmount()), userSharerInfo + ".numExpenses",
                 FieldValue.increment(1));
         batch.commit();
+    }
+
+    /**
+     * Adds the given expense to the currently selected List. Adds the ID of the currently logged
+     * in user to the logged expense.
+     *
+     * @param expense The {@link Expense} to add.
+     */
+    public void addExpense(Expense expense) {
+        addExpense(expense, null, null);
     }
 
     /**

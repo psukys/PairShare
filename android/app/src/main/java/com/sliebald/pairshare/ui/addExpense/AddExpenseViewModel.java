@@ -8,6 +8,7 @@ import androidx.lifecycle.ViewModel;
 
 import com.sliebald.pairshare.data.Repository;
 import com.sliebald.pairshare.data.models.Expense;
+import com.sliebald.pairshare.utils.ImageUtils;
 
 import java.util.Calendar;
 import java.util.Objects;
@@ -87,7 +88,7 @@ class AddExpenseViewModel extends ViewModel {
         expense.setAmount(amount);
         expense.setUserName(username);
         expense.setTimeOfExpense(Objects.requireNonNull(calendar.getValue()).getTime());
-        Repository.getInstance().addExpense(expense);
+        Repository.getInstance().addExpense(expense, image, thumbnail);
     }
 
     /**
@@ -95,7 +96,7 @@ class AddExpenseViewModel extends ViewModel {
      *
      * @return Path. Parse with Uri.fromFile(new File(path))
      */
-    public String getLatestImagePath() {
+    String getLatestImagePath() {
         return latestImagePath;
     }
 
@@ -104,17 +105,8 @@ class AddExpenseViewModel extends ViewModel {
      *
      * @param latestImagePath The path to the file.
      */
-    public void setLatestImagePath(String latestImagePath) {
+    void setLatestImagePath(String latestImagePath) {
         this.latestImagePath = latestImagePath;
-    }
-
-    /**
-     * Get the image to add to the {@link Expense}.
-     *
-     * @return image as bitmap
-     */
-    public Bitmap getImage() {
-        return image;
     }
 
     /**
@@ -122,25 +114,19 @@ class AddExpenseViewModel extends ViewModel {
      *
      * @param image as Bitmap
      */
-    public void setImage(Bitmap image) {
-        this.image = image;
+    void setImage(Bitmap image) {
+        this.image = ImageUtils.getResizedBitmap(image, 640);
+        this.thumbnail = ImageUtils.getResizedBitmap(image, 128);
     }
 
     /**
-     * Get the image thumbnail to add to the {@link Expense}.
+     * Get the image to add to the {@link Expense}.
      *
-     * @return low size thumbnail.
+     * @return  image as Bitmap
      */
-    public Bitmap getThumbnail() {
-        return thumbnail;
+    Bitmap getImage(){
+        return image;
     }
 
-    /**
-     * Set the image thumbnail to add to the {@link Expense}.
-     *
-     * @param thumbnail as Bitmap.s
-     */
-    public void setThumbnail(Bitmap thumbnail) {
-        this.thumbnail = thumbnail;
-    }
+
 }

@@ -2,6 +2,7 @@ package com.sliebald.pairshare.ui.overviewExpenses;
 
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -9,9 +10,12 @@ import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
 import com.sliebald.pairshare.MyApplication;
 import com.sliebald.pairshare.R;
 import com.sliebald.pairshare.data.models.Expense;
+import com.sliebald.pairshare.utils.GlideApp;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -27,6 +31,7 @@ public class ExpenseHolder extends RecyclerView.ViewHolder {
     private final TextView mExpenseDate;
     private final TextView mExpenseAmount;
     private final CardView mCardView;
+    private final ImageView mImageView;
 
     /**
      * Create the {@link ExpenseHolder} for an Expense.
@@ -39,7 +44,7 @@ public class ExpenseHolder extends RecyclerView.ViewHolder {
         mExpenseAmount = itemView.findViewById(R.id.tv_label_amount);
         mExpenseDate = itemView.findViewById(R.id.tv_label_date_name);
         mCardView = itemView.findViewById(R.id.cv_expense_item);
-
+        mImageView = itemView.findViewById(R.id.iv_thumbnail);
     }
 
     /**
@@ -51,6 +56,7 @@ public class ExpenseHolder extends RecyclerView.ViewHolder {
 
         String myId = FirebaseAuth.getInstance().getUid();
 
+        // own expenses shifted to the right, others to the left.
         ViewGroup.MarginLayoutParams params =
                 (ViewGroup.MarginLayoutParams) mCardView.getLayoutParams();
         if (expense.getUserID().equals(myId)) {
@@ -58,7 +64,6 @@ public class ExpenseHolder extends RecyclerView.ViewHolder {
                     .getResources().getColor(R.color.balance_slight_positive, null));
             params.setMarginEnd(15);
             params.setMarginStart(120);
-
         } else {
             mCardView.setCardBackgroundColor(MyApplication.getContext()
                     .getResources().getColor(R.color.balance_slight_negative, null));
@@ -66,12 +71,22 @@ public class ExpenseHolder extends RecyclerView.ViewHolder {
             params.setMarginEnd(120);
         }
         mCardView.requestLayout();
+        // Set the comment.
         mComment.setText(expense.getComment());
-        DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm", Locale.GERMAN);
 
+        // Set the date
+        DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm", Locale.GERMAN);
         mExpenseDate.setText(String.format("%s - %s",
                 dateFormat.format(expense.getTimeOfExpense()), expense.getUserName()));
+        // Set expense amount
         mExpenseAmount.setText(String.format(Locale.GERMAN, "%.2f€", expense.getAmount()));
+        // Load thumbnail preview from firestore.
+        FirebaseStorage firebaseStorage = FirebaseStorage.getInstance();
+        StorageReference thumbnailRef =
+                firebaseStorage.getReference().child(expense.getThumbnailPath());
+        GlideApp.with(MyApplication.getContext())
+                .load(thumbnailRef)
+                .into(mImageView);
     }
 
 
