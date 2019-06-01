@@ -8,6 +8,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.swiperefreshlayout.widget.CircularProgressDrawable;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.storage.FirebaseStorage;
@@ -80,13 +81,23 @@ public class ExpenseHolder extends RecyclerView.ViewHolder {
                 dateFormat.format(expense.getTimeOfExpense()), expense.getUserName()));
         // Set expense amount
         mExpenseAmount.setText(String.format(Locale.GERMAN, "%.2f€", expense.getAmount()));
-        // Load thumbnail preview from firestore.
-        FirebaseStorage firebaseStorage = FirebaseStorage.getInstance();
-        StorageReference thumbnailRef =
-                firebaseStorage.getReference().child(expense.getThumbnailPath());
-        GlideApp.with(MyApplication.getContext())
-                .load(thumbnailRef)
-                .into(mImageView);
+        // Load thumbnail preview from firestore if a image is attached.
+        if (expense.getThumbnailPath() != null) {
+            FirebaseStorage firebaseStorage = FirebaseStorage.getInstance();
+            StorageReference thumbnailRef =
+                    firebaseStorage.getReference().child(expense.getThumbnailPath());
+            CircularProgressDrawable progressDrawable =
+                    new CircularProgressDrawable(MyApplication.getContext());
+            progressDrawable.setStrokeWidth(5f);
+            progressDrawable.setCenterRadius(30f);
+            progressDrawable.start();
+            GlideApp.with(MyApplication.getContext())
+                    .load(thumbnailRef)
+                    .placeholder(progressDrawable)
+                    .into(mImageView);
+        } else {
+            mImageView.setVisibility(View.GONE);
+        }
     }
 
 

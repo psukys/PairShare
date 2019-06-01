@@ -89,6 +89,7 @@ class AddExpenseViewModel extends ViewModel {
         expense.setUserName(username);
         expense.setTimeOfExpense(Objects.requireNonNull(calendar.getValue()).getTime());
         Repository.getInstance().addExpense(expense, image, thumbnail);
+        clearImage();
     }
 
     /**
@@ -110,6 +111,15 @@ class AddExpenseViewModel extends ViewModel {
     }
 
     /**
+     * Get the image to add to the {@link Expense}.
+     *
+     * @return image as Bitmap
+     */
+    Bitmap getImage() {
+        return image;
+    }
+
+    /**
      * Set the image to add to the {@link Expense}.
      *
      * @param image as Bitmap
@@ -120,13 +130,11 @@ class AddExpenseViewModel extends ViewModel {
     }
 
     /**
-     * Get the image to add to the {@link Expense}.
-     *
-     * @return  image as Bitmap
+     * Clear the imagedetails after submitting an expense
      */
-    Bitmap getImage(){
-        return image;
+    private void clearImage() {
+        this.image = null;
+        this.thumbnail = null;
+        latestImagePath = null;
     }
-
-
 }
