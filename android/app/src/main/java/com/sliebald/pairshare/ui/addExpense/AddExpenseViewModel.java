@@ -17,7 +17,7 @@ import java.util.Objects;
  * Viewmodel for the {@link AddExpenseFragment}. Handling interaction with the {@link Repository}
  * and implements other logic
  */
-class AddExpenseViewModel extends ViewModel {
+public class AddExpenseViewModel extends ViewModel {
 
     /**
      * Tag for logging.

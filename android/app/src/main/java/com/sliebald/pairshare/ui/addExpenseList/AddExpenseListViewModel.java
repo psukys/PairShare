@@ -6,13 +6,14 @@ import androidx.lifecycle.ViewModel;
 
 import com.sliebald.pairshare.data.Repository;
 
-class AddExpenseListViewModel extends ViewModel implements Repository.ResultCallback {
+public class AddExpenseListViewModel extends ViewModel implements Repository.ResultCallback {
 //TODO: externalize Strings
 
     private static final String TAG = AddExpenseListViewModel.class.getSimpleName();
 
     private MutableLiveData<String> errorMessage;
     private MutableLiveData<Boolean> operationSuccessful;
+
 
     /**
      * Livedata exposing error messages to the view in case an error occurred.
