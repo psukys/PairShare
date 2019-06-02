@@ -21,11 +21,13 @@ import androidx.navigation.ui.NavigationUI;
 import com.firebase.ui.auth.AuthUI;
 import com.firebase.ui.auth.IdpResponse;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.sliebald.pairshare.databinding.ActivityMainBinding;
 import com.sliebald.pairshare.utils.ExpenseListUtils;
 import com.sliebald.pairshare.utils.KeyboardUtils;
+import com.sliebald.pairshare.utils.PreferenceUtils;
 
 import net.yslibrary.android.keyboardvisibilityevent.KeyboardVisibilityEvent;
 
@@ -89,12 +91,28 @@ public class MainActivity extends AppCompatActivity {
         setupActionBar(mNavController);
         setupBottomNavMenu(mNavController);
 
+        // Make some extra checks which destination changes are currently allowed and handle
+        // bottom navigation visibility.
         mNavController.addOnDestinationChangedListener((controller, destination, arguments) -> {
-            if (destination.getId() == R.id.about_dest
-                    || destination.getId() == R.id.addExpenseList_dest) {
+            //if no expenselist is selected, let them select or add one
+            if ((PreferenceUtils.getSelectedSharedExpenseListID() == null
+                    || PreferenceUtils.getSelectedSharedExpenseListID().isEmpty())) {
                 mBinding.bottomNavView.setVisibility(View.GONE);
+                if (!(destination.getId() == R.id.selectExpenseList_dest
+                        || destination.getId() == R.id.addExpenseList_dest)) {
+                    Snackbar.make(mBinding.mainLayout,
+                            getString(R.string.warning_add_select_list),
+                            Snackbar.LENGTH_LONG).show();
+                    mNavController.navigate(R.id.selectExpenseList_dest);
+
+                }
             } else {
-                mBinding.bottomNavView.setVisibility(View.VISIBLE);
+                if (destination.getId() == R.id.about_dest
+                        || destination.getId() == R.id.addExpenseList_dest) {
+                    mBinding.bottomNavView.setVisibility(View.GONE);
+                } else {
+                    mBinding.bottomNavView.setVisibility(View.VISIBLE);
+                }
             }
         });
 
