@@ -12,7 +12,6 @@ import android.view.View;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.databinding.DataBindingUtil;
-import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
@@ -24,7 +23,6 @@ import com.firebase.ui.auth.IdpResponse;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.sliebald.pairshare.data.models.ExpenseList;
 import com.sliebald.pairshare.databinding.ActivityMainBinding;
 import com.sliebald.pairshare.utils.ExpenseListUtils;
 import com.sliebald.pairshare.utils.KeyboardUtils;
@@ -35,7 +33,6 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
-import java.util.Objects;
 import java.util.Set;
 
 public class MainActivity extends AppCompatActivity {
@@ -92,27 +89,32 @@ public class MainActivity extends AppCompatActivity {
         setupActionBar(mNavController);
         setupBottomNavMenu(mNavController);
 
-        mViewModel.getActiveExpenseList().observe(this, new Observer<ExpenseList>() {
-            @Override
-            public void onChanged(ExpenseList expenseList) {
-
-                double expenseDiff =
-                        ExpenseListUtils.getExpenseDifferenceFor(mFirebaseAuth.getUid(),
-                                expenseList);
-
-                String title = expenseList.getListName() + ": ";
-                String completeSummaryString = title + String.format(Locale.GERMAN, "%.2f€", expenseDiff);
-
-                Spannable spannable = new SpannableString(completeSummaryString);
-
-                spannable.setSpan(new ForegroundColorSpan(ExpenseListUtils.getExpenseDifferenceColor(expenseDiff)), title.length(),
-                        completeSummaryString.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-
-                mBinding.toolbar.setSubtitle(spannable);
+        mNavController.addOnDestinationChangedListener((controller, destination, arguments) -> {
+            if (destination.getId() == R.id.about_dest
+                    || destination.getId() == R.id.addExpenseList_dest) {
+                mBinding.bottomNavView.setVisibility(View.GONE);
+            } else {
+                mBinding.bottomNavView.setVisibility(View.VISIBLE);
             }
         });
-    }
 
+        //Get the current expense diff for the subtitle in all fragments
+        mViewModel.getActiveExpenseList().observe(this, expenseList -> {
+            double expenseDiff =
+                    ExpenseListUtils.getExpenseDifferenceFor(mFirebaseAuth.getUid(),
+                            expenseList);
+
+            String title = expenseList.getListName() + ": ";
+            String completeSummaryString = title + String.format(Locale.GERMAN, "%.2f€", expenseDiff);
+
+            Spannable spannable = new SpannableString(completeSummaryString);
+
+            spannable.setSpan(new ForegroundColorSpan(ExpenseListUtils.getExpenseDifferenceColor(expenseDiff)), title.length(),
+                    completeSummaryString.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+
+            mBinding.toolbar.setSubtitle(spannable);
+        });
+    }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -150,11 +152,6 @@ public class MainActivity extends AppCompatActivity {
         KeyboardVisibilityEvent.setEventListener(
                 this,
                 isOpen -> {
-                    int activeFragment =
-                            Objects.requireNonNull(navController.getCurrentDestination()).getId();
-                    // in addExpenseList_dest the bottomNav is never shown.
-                    if (activeFragment == R.id.addExpenseList_dest)
-                        return;
                     if (isOpen) {
                         bottomNav.setVisibility(View.GONE);
                     } else {
@@ -194,6 +191,11 @@ public class MainActivity extends AppCompatActivity {
             AuthUI.getInstance().signOut(this);
             return true;
         }
+        if (item.getItemId() == R.id.about_dest) {
+            return NavigationUI.onNavDestinationSelected(item, mNavController)
+                    || super.onOptionsItemSelected(item);
+        }
+
         return super.onOptionsItemSelected(item);
     }
 

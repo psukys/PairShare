@@ -64,16 +64,4 @@ public class AddExpenseListFragment extends Fragment {
         });
 
     }
-
-    @Override
-    public void onStart() {
-        super.onStart();
-        Objects.requireNonNull(getActivity()).findViewById(R.id.bottom_nav_view).setVisibility(View.GONE);
-    }
-
-    @Override
-    public void onStop() {
-        super.onStop();
-        Objects.requireNonNull(getActivity()).findViewById(R.id.bottom_nav_view).setVisibility(View.VISIBLE);
-    }
 }
