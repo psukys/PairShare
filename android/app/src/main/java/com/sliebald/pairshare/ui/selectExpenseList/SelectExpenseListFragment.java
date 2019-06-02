@@ -15,6 +15,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.firebase.ui.firestore.FirestoreRecyclerAdapter;
 import com.firebase.ui.firestore.FirestoreRecyclerOptions;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.Query;
 import com.sliebald.pairshare.R;
 import com.sliebald.pairshare.data.Repository;
@@ -55,36 +56,37 @@ public class SelectExpenseListFragment extends Fragment {
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
-        Query query = Repository.getInstance().getExpenseListsQuery();
+        if (FirebaseAuth.getInstance().getCurrentUser() != null) {
+            Query query = Repository.getInstance().getExpenseListsQuery();
 
 
-        FirestoreRecyclerOptions<ExpenseList> options =
-                new FirestoreRecyclerOptions.Builder<ExpenseList>()
-                        .setQuery(query, ExpenseList.class)
-                        .setLifecycleOwner(this)
-                        .build();
+            FirestoreRecyclerOptions<ExpenseList> options =
+                    new FirestoreRecyclerOptions.Builder<ExpenseList>()
+                            .setQuery(query, ExpenseList.class)
+                            .setLifecycleOwner(this)
+                            .build();
 
-        expenseListsAdapter = new FirestoreRecyclerAdapter<ExpenseList,
-                ExpenseListHolder>(options) {
-            @Override
-            public void onBindViewHolder(@NonNull ExpenseListHolder holder, int position,
-                                         @NonNull ExpenseList expenseList) {
-                holder.bind(expenseList, getSnapshots().getSnapshot(position).getId());
-                Log.d(TAG, "Binding List: " + expenseList.getListName());
-            }
+            expenseListsAdapter = new FirestoreRecyclerAdapter<ExpenseList,
+                    ExpenseListHolder>(options) {
+                @Override
+                public void onBindViewHolder(@NonNull ExpenseListHolder holder, int position,
+                                             @NonNull ExpenseList expenseList) {
+                    holder.bind(expenseList, getSnapshots().getSnapshot(position).getId());
+                    Log.d(TAG, "Binding List: " + expenseList.getListName());
+                }
 
-            @NonNull
-            @Override
-            public ExpenseListHolder onCreateViewHolder(@NonNull ViewGroup group, int i) {
-                View view = LayoutInflater.from(group.getContext())
-                        .inflate(R.layout.recycler_item_expense_list, group, false);
-                return new ExpenseListHolder(view);
-            }
-        };
+                @NonNull
+                @Override
+                public ExpenseListHolder onCreateViewHolder(@NonNull ViewGroup group, int i) {
+                    View view = LayoutInflater.from(group.getContext())
+                            .inflate(R.layout.recycler_item_expense_list, group, false);
+                    return new ExpenseListHolder(view);
+                }
+            };
 
-        mBinding.rvActiveLists.setAdapter(expenseListsAdapter);
-        mBinding.rvActiveLists.setLayoutManager(new LinearLayoutManager(getContext()));
-
+            mBinding.rvActiveLists.setAdapter(expenseListsAdapter);
+            mBinding.rvActiveLists.setLayoutManager(new LinearLayoutManager(getContext()));
+        }
     }
 
 }
