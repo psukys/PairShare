@@ -57,7 +57,7 @@ public class ExpenseListUtils {
         else if (difference <= -100)
             return MyApplication.getContext()
                     .getResources().getColor(R.color.balance_negative, null);
-        else return Color.DKGRAY;
+        else return Color.BLACK;
     }
 
 }
